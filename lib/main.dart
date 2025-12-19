@@ -1,18 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/deptselection_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/saved_docs.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 
 void main() {
   // Initialize API service

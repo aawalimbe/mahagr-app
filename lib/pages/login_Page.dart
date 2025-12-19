@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/forgot_password.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
@@ -22,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final _otpController = TextEditingController();
 
   bool _isLoading = false;
-  bool _obscureOTP = false;
+  final bool _obscureOTP = false;
 
   @override
   void dispose() {
@@ -165,8 +164,9 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.isEmpty)
+                          if (value == null || value.isEmpty) {
                             return "Enter OTP";
+                          }
                           if (!RegExp(r'^[0-9]{6}$').hasMatch(value)) {
                             return "Enter valid 6-digit OTP";
                           }

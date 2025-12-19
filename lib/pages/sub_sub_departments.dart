@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/gr_list.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_list.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -113,10 +112,11 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
 
     if (picked != null) {
       setState(() {
-        if (isFromDate)
+        if (isFromDate) {
           _fromDate = picked;
-        else
+        } else {
           _toDate = picked;
+        }
       });
     }
   }
@@ -159,7 +159,7 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "${widget.departmentNameMar}",
+            widget.departmentNameMar,
             style: AppTextStyles.bold(19.sp),
           ),
           centerTitle: true,

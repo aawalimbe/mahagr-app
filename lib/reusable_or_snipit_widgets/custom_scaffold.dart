@@ -10,10 +10,10 @@ class CustomScaffold extends StatelessWidget {
   final Widget? bottomNavigationBar;
 
   const CustomScaffold({
-    Key? key,
+    super.key,
     required this.body,
     this.bottomNavigationBar,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

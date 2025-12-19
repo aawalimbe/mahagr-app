@@ -141,10 +141,12 @@ class _ShareDocsState extends State<ShareDocs> {
           controller: _descriptionController,
           maxLines: 3,
           validator: (value) {
-            if (value == null || value.trim().isEmpty)
+            if (value == null || value.trim().isEmpty) {
               return 'Subject is required';
-            if (value.trim().length < 10)
+            }
+            if (value.trim().length < 10) {
               return 'Subject must be at least 10 characters long';
+            }
             return null;
           },
           decoration: InputDecoration(

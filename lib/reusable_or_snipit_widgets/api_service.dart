@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'api_list.dart';
-import 'app_config.dart';
+import 'api_config.dart';
 
 class ApiService {
   static final Dio _dio = Dio();
@@ -11,11 +11,11 @@ class ApiService {
   // Configure Dio with base settings
   static void initialize() {
     print('=== API SERVICE INITIALIZATION ===');
-    print('AppConfig.isDevelopment: ${AppConfig.isDevelopment}');
-    print('AppConfig.baseUrl: ${AppConfig.baseUrl}');
+    print('ApiConfig.currentEnvironment: ${ApiConfig.currentEnvironment}');
+    print('ApiConfig.baseUrl: ${ApiConfig.baseUrl}');
     print('================================');
 
-    _dio.options.baseUrl = AppConfig.baseUrl;
+    _dio.options.baseUrl = ApiConfig.baseUrl;
     _dio.options.connectTimeout = const Duration(seconds: 30);
     _dio.options.receiveTimeout = const Duration(seconds: 30);
     _dio.options.headers = {
@@ -24,7 +24,7 @@ class ApiService {
     };
 
     // Add logging interceptor for debugging
-    if (AppConfig.enableLogging) {
+    if (ApiConfig.enableLogging) {
       _dio.interceptors.add(
         LogInterceptor(
           requestBody: true,
@@ -144,8 +144,9 @@ class ApiService {
         'Fetching departments from: ${_dio.options.baseUrl}${ApiList.departments}',
       );
       final response = await _dio.get(ApiList.departments);
-      if (response.data is List)
+      if (response.data is List) {
         return List<Map<String, dynamic>>.from(response.data);
+      }
       return [];
     } on DioException catch (e) {
       // Try alternate base URL pattern if server path differs (api vs apis)
@@ -183,8 +184,9 @@ class ApiService {
   static Future<List<Map<String, dynamic>>> getDistricts() async {
     try {
       final response = await _dio.get(ApiList.districts);
-      if (response.data is List)
+      if (response.data is List) {
         return List<Map<String, dynamic>>.from(response.data);
+      }
       return [];
     } on DioException catch (e) {
       throw _handleDioError(e);
@@ -222,8 +224,9 @@ class ApiService {
       // Note: Currently the API returns all notifications
       // In the future, we can add user_id as a query parameter when the API supports it
       final response = await _dio.get(ApiList.notifications);
-      if (response.data is List)
+      if (response.data is List) {
         return List<Map<String, dynamic>>.from(response.data);
+      }
       return [];
     } on DioException catch (e) {
       throw _handleDioError(e);
@@ -293,8 +296,9 @@ class ApiService {
       final data = <String, dynamic>{};
       if (status != null && status.isNotEmpty) data['status'] = status;
       final response = await _dio.post(ApiList.fetchSubjects, data: data);
-      if (response.data is List)
+      if (response.data is List) {
         return List<Map<String, dynamic>>.from(response.data);
+      }
       return [];
     } on DioException catch (e) {
       throw _handleDioError(e);
@@ -307,12 +311,12 @@ class ApiService {
   static Future<bool> testConnection() async {
     try {
       print('Testing connection to: ${_dio.options.baseUrl}departments.php');
-      print('Full URL: ${AppConfig.baseUrl}departments.php');
+      print('Full URL: ${ApiConfig.baseUrl}departments.php');
 
       // First try with http package
       try {
         final httpResponse = await http.get(
-          Uri.parse('${AppConfig.baseUrl}departments.php'),
+          Uri.parse('${ApiConfig.baseUrl}departments.php'),
         );
         print('HTTP test successful: ${httpResponse.statusCode}');
         print('HTTP response: ${httpResponse.body}');
@@ -334,7 +338,7 @@ class ApiService {
   // Simple network test using http package
   static Future<bool> testNetworkConnectivity() async {
     try {
-      final url = '${AppConfig.baseUrl}departments.php';
+      final url = '${ApiConfig.baseUrl}departments.php';
       print('Testing network connectivity to: $url');
 
       final response = await http.get(Uri.parse(url));

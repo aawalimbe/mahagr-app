@@ -4,7 +4,6 @@ import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widget
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_list.dart';
 
 class NotificationPage extends StatefulWidget {
   const NotificationPage({super.key});

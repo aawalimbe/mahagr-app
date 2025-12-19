@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/welcome_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 
 class StartPage extends StatelessWidget {
-  const StartPage({Key? key}) : super(key: key);
+  const StartPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +221,7 @@ class StartPage extends StatelessWidget {
 
 class FeatureText extends StatelessWidget {
   final String text;
-  const FeatureText(this.text, {Key? key}) : super(key: key);
+  const FeatureText(this.text, {super.key});
 
   @override
   Widget build(BuildContext context) {

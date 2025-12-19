@@ -24,7 +24,7 @@ class _NewRegistrationState extends State<NewRegistration> {
   String? _selectedDepartment;
 
   List<String> _districts = [];
-  List<String> _departments = [];
+  final List<String> _departments = [];
 
   bool _isLoading = false;
 

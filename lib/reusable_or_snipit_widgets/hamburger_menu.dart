@@ -16,7 +16,7 @@ import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widget
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 
 class HamburgerMenu extends StatelessWidget {
-  const HamburgerMenu({Key? key}) : super(key: key);
+  const HamburgerMenu({super.key});
 
   Widget _menuItem({
     required IconData icon,

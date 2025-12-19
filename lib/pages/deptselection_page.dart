@@ -51,6 +51,8 @@ class _DepartmentSelectionPageState extends State<DepartmentSelectionPage> {
 }
 
 class DepartmentChecklist extends StatefulWidget {
+  const DepartmentChecklist({super.key});
+
   @override
   _DepartmentChecklistState createState() => _DepartmentChecklistState();
 }

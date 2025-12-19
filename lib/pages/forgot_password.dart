@@ -250,7 +250,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 style: AppTextStyles.bold(18.sp),
                 textAlign: TextAlign.center,
               ),
-              content: Container(
+              content: SizedBox(
                 width: 300.w,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

@@ -11,11 +11,11 @@ class ViewerBottomNavigator extends StatelessWidget {
   final VoidCallback onRotate;
 
   const ViewerBottomNavigator({
-    Key? key,
+    super.key,
     required this.onShare,
     required this.onDownload,
     required this.onRotate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

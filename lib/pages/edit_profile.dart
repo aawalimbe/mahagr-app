@@ -23,7 +23,7 @@ class _EditProfileState extends State<EditProfile> {
   String? _selectedDepartment;
 
   List<String> _districts = [];
-  List<String> _departments = [];
+  final List<String> _departments = [];
 
   bool _isLoading = false;
 

@@ -1,8 +1,8 @@
-import 'app_config.dart';
+import 'api_config.dart';
 
 class ApiList {
   // Base URL for all API endpoints
-  static String get baseUrl => AppConfig.baseUrl;
+  static String get baseUrl => ApiConfig.baseUrl;
 
   // Authentication APIs
   static const String login = 'login.php';

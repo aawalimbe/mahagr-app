@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_config.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_config.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
@@ -160,7 +160,7 @@ class _GrListState extends State<GrList> {
                                                               .trim()
                                                               .isNotEmpty ==
                                                           true)
-                                                      ? AppConfig.baseUrl +
+                                                      ? ApiConfig.baseUrl.replaceAll('/api/', '/') +
                                                           d["file_upload_location"]
                                                       : d["gr_link"];
 

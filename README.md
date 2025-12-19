@@ -1,21 +1,22 @@
-# 🌲 Forest Department GR & Updates App
+# Forest Department GR & Updates App
 
 **Client:** Rahul Sapkal, RFO  
 **Prepared By:** Akshay – Alpha Developer Team  
 **Date:** 30 Nov 2024  
-**Last Updated:** September 2025
+**Last Updated:** January 2025
 
 ---
 
 ## 📱 Project Overview
 
-This Flutter-based mobile application enables Forest Department staff and stakeholders to access Government Regulations (GRs), law updates, and official communications in various formats (PDF, text, images). The app is designed for cross-platform use (Android/iOS/Web/Desktop), with a focus on speed, clarity, and accessibility. The project now includes a complete PHP backend API for user management and document handling.
+This Flutter-based mobile application enables Forest Department staff and stakeholders to access Government Regulations (GRs), law updates, and official communications in various formats (PDF, text, images). The app is designed for cross-platform use (Android/iOS/Web/Desktop), with a focus on speed, clarity, and accessibility. The project includes a complete PHP backend API for user management and document handling.
 
 ---
 
 ## 🎯 Key Features
 
 ### ✅ **Implemented Features**
+
 - **User Authentication:** Secure login and registration with form validation and PHP backend integration
 - **Password Management:** Forgot password functionality with email-based reset and secure password updates
 - **Department Selection:** Users can select their department and district for personalized content
@@ -34,13 +35,16 @@ This Flutter-based mobile application enables Forest Department staff and stakeh
 - **Offline Assets:** Bundled images, PDFs, and data for offline access
 - **PHP Backend API:** Complete backend system for user management, document handling, and data persistence
 - **Admin Panel:** Administrative interface for user and content management
+- **Multi-language Support:** English and Marathi language support
+- **Theme Support:** Light and dark theme modes
 
 ### 🚧 **In Progress**
+
 - **Advanced Notifications:** Enhanced push notification system with user preferences
-- **Multi-language Support:** Language selection for broader accessibility
 - **Document Versioning:** Track document changes and maintain version history
 
 ### 📋 **Planned Features**
+
 - Advanced search and filtering capabilities
 - User activity tracking and analytics
 - Bulk document operations
@@ -51,82 +55,40 @@ This Flutter-based mobile application enables Forest Department staff and stakeh
 
 ## 🧭 App Flow
 
-```mermaid
-flowchart TD
-    A[Start Page] --> B[Welcome Page]
-    B --> C[Splash Screen]
-    C --> D[Login/Registration]
-    D --> E[Forgot Password]
-    D --> F[Department Selection]
-    F --> G[Home Page]
-    
-    %% Main Department Navigation Flow
-    G --> H[Department Grid]
-    H --> I[Sub Departments]
-    I --> J[Sub-Sub Departments]
-    J --> K[Expandable Department List]
-    K --> L[GR List Page]
-    L --> M[Document Viewer]
-    M --> N[PDF Viewer]
-    M --> O[Image Viewer]
-    
-    %% Home Page Band Navigation
-    G --> P[Notifications]
-    G --> Q[Language Toggle]
-    G --> R[Theme Toggle]
-    G --> S[Share App]
-    
-    %% Hamburger Menu Navigation
-    G --> T[Edit Profile]
-    G --> U[Saved Documents]
-    G --> V[Privacy Policies]
-    G --> W[Refund Policies]
-    G --> X[Terms & Conditions]
-    G --> Y[Disclaimer]
-    G --> Z[Contact Us]
-    
-    %% App Bar More Menu Navigation
-    G --> AA[Customs Notifications]
-    G --> BB[Give Suggestions]
-    G --> CC[Upload Documents]
-    
-    %% Document Upload Flow
-    CC --> DD[File Picker]
-    DD --> EE[Form Validation]
-    EE --> FF[Upload to Server]
-    FF --> GG[Success/Error Handling]
-    GG --> HH[Return to Home]
-    
-    %% Document Management Flow
-    M --> II[Share Document]
-    M --> JJ[Download Document]
-    M --> KK[Save Document]
-    
-    %% Search and Filter Flow
-    J --> LL[Search Departments]
-    J --> MM[Date Filter]
-    J --> NN[Search Button]
-    
-    %% Profile and Settings Flow
-    T --> OO[Update Profile Info]
-    T --> PP[Change Password]
-    T --> QQ[Update Preferences]
-    
-    %% Notifications Flow
-    P --> RR[System Notifications]
-    AA --> SS[Custom Notifications]
-    
-    %% Suggestions and Feedback Flow
-    BB --> TT[Submit Suggestion]
-    Z --> UU[Contact Form]
-    
-    %% Document Viewing Flow
-    N --> VV[PDF Navigation]
-    N --> WW[Zoom Controls]
-    N --> XX[Download Options]
-    O --> YY[Image Zoom]
-    O --> ZZ[Image Navigation]
 ```
+Start Page → Welcome Page → Splash Screen → Login/Registration
+    ↓
+Department Selection → Home Page
+    ↓
+Department Grid → Sub Departments → Sub-Sub Departments → Expandable List → GR List → Document Viewer
+    ↓
+[PDF Viewer / Image Viewer] → Share/Download/Save Options
+```
+
+### **Home Page Navigation Structure**
+
+The Home Page serves as the central hub with **4 main navigation areas**:
+
+1. **Department Grid (Main Content)**
+   - 3x3 Grid Layout displaying department logos and names
+   - Navigation Flow: Home → Department Grid → Sub Departments → Sub-Sub Departments → Expandable List → GR List → Document Viewer
+   - Features: Search functionality, date filtering, expandable department rows
+
+2. **Home Page Band (Top Bar)**
+   - Notifications: Access to system notifications
+   - Language Toggle: Switch between English and Marathi
+   - Theme Toggle: Change app appearance
+   - Share App: Share the application
+
+3. **Hamburger Menu (Left Drawer)**
+   - Profile Management: Edit Profile, Saved Documents
+   - Legal Pages: Privacy Policies, Refund Policies, Terms & Conditions, Disclaimer
+   - Support: Contact Us
+
+4. **App Bar More Menu (Top Right)**
+   - Customs Notifications: Custom notification system
+   - Give Suggestions: Submit feedback and suggestions
+   - Upload Documents: Document upload functionality
 
 ---
 
@@ -165,9 +127,11 @@ flowchart TD
 ## 📁 Project Structure
 
 ```
-App/
+mahagr-app/
 ├── lib/
 │   ├── main.dart                    # Main app entry point
+│   ├── splash_screen.dart           # App launch screen
+│   ├── test_connection.dart         # Network connectivity testing
 │   ├── pages/                       # App screens and pages
 │   │   ├── start_page.dart          # App initialization
 │   │   ├── welcome_page.dart        # Welcome screen
@@ -176,9 +140,9 @@ App/
 │   │   ├── forgot_password.dart     # Password recovery
 │   │   ├── deptselection_page.dart  # Department selection
 │   │   ├── home_page.dart           # Main dashboard
-│   │   ├── gr_list.dart             # GR List page
-│   │   ├── sub_departments.dart     # Sub-departments
+│   │   ├── sub_dept.dart            # Sub-departments
 │   │   ├── sub_sub_departments.dart # Expandable department list
+│   │   ├── gr_list.dart             # GR List page
 │   │   ├── pdf_viewer.dart          # PDF document viewer
 │   │   ├── img_viewer.dart          # Image viewer
 │   │   ├── edit_profile.dart        # Profile management
@@ -192,15 +156,18 @@ App/
 │   │   ├── privacy_policies.dart    # Privacy policy
 │   │   ├── refund_policies.dart     # Refund policy
 │   │   └── disclaimer_policies.dart # Disclaimer
-│   ├── reusable_or_snipit_widgets/  # Shared components
-│   │   ├── api_service.dart         # HTTP client and API calls
-│   │   ├── api_list.dart            # API endpoint definitions
-│   │   ├── app_config.dart          # App configuration
-│   │   ├── user_storage.dart        # Local data persistence
-│   │   ├── hamburger_menu.dart      # Navigation menu
-│   │   ├── home_page_band.dart      # Home page header
-│   │   └── theme_provider.dart      # Theme management
-│   └── splash_screen.dart           # App launch screen
+│   └── reusable_or_snipit_widgets/  # Shared components
+│       ├── api_service.dart         # HTTP client and API calls
+│       ├── api_list.dart            # API endpoint definitions
+│       ├── app_config.dart          # App configuration
+│       ├── appbar.dart              # Custom app bar
+│       ├── colors.dart              # Color definitions
+│       ├── custom_scaffold.dart     # Custom scaffold widget
+│       ├── hamburger_menu.dart      # Navigation menu
+│       ├── home_page_band.dart      # Home page header
+│       ├── language_provider.dart   # Language management
+│       ├── theme_provider.dart      # Theme management
+│       └── viewer_bottomNevigator.dart # Viewer navigation
 ├── api/                             # PHP Backend API
 │   ├── login.php                    # User authentication
 │   ├── register.php                 # User registration
@@ -220,7 +187,7 @@ App/
 │   ├── shared_document.php          # Shared documents
 │   ├── departments.php              # Department data
 │   ├── districts.php                # District data
-│   ├── categories.php               # Category management
+│   ├── categories.php                # Category management
 │   ├── add_category.php             # Add categories
 │   ├── update_category.php          # Update categories
 │   ├── delete_category.php          # Delete categories
@@ -230,10 +197,12 @@ App/
 │   ├── connect.inc.php              # Database connection
 │   ├── core.inc.php                 # Core functions
 │   ├── security_fixes.php           # Security enhancements
+│   ├── API_DOCUMENTATION.md         # API documentation
+│   ├── UPLOAD_FUNCTIONALITY.md      # Upload feature docs
 │   └── uploads/                     # Document storage
 ├── assets/                          # App resources
 │   ├── data/                        # Local JSON data
-│   ├── fonts/                       # Custom fonts
+│   ├── fonts/                       # Custom fonts (OpenSans)
 │   ├── images/                      # App images and icons
 │   └── pdf_img_text/                # Sample documents
 ├── android/                         # Android-specific code
@@ -243,14 +212,13 @@ App/
 ├── linux/                          # Linux desktop support
 ├── macos/                          # macOS desktop support
 ├── pubspec.yaml                    # Flutter dependencies
-├── maha_gr.sql                     # Database schema
+├── maha_gr(2).sql                  # Database schema
+├── subject_master(1).sql           # Subject master data
 ├── API_DOCUMENTATION.md            # API documentation
 ├── API_QUICK_REFERENCE.md          # Quick API reference
 ├── API_SETUP_GUIDE.md              # API setup guide
 ├── api_improvements.md             # API enhancement recommendations
-├── UPLOAD_FUNCTIONALITY.md         # Upload feature docs
-├── NOTIFICATIONS_API_INTEGRATION.md # Notifications docs
-└── README.md                       # Project documentation
+└── NOTIFICATIONS_API_INTEGRATION.md # Notifications docs
 ```
 
 ---
@@ -264,101 +232,147 @@ App/
 - [MySQL](https://mysql.com/) (>=5.7) for database
 - Android Studio or Xcode for device emulation
 - Internet connection for package installation
+- AMPPS/XAMPP/WAMP for local server (optional)
 
 ### Installation
 
-#### 1. **Flutter App Setup**
-```sh
-git clone <repo-url>
-cd forrest_department_gr_and_updatees_app/App
+#### 1. **Clone the Repository**
+```bash
+git clone https://github.com/aawalimbe/mahagr-app.git
+cd mahagr-app
+```
+
+#### 2. **Flutter App Setup**
+```bash
+# Install dependencies
 flutter pub get
+
+# Verify Flutter installation
+flutter doctor
 ```
 
-#### 2. **Backend API Setup**
-```sh
-# Copy api/ folder to your web server (e.g., XAMPP, WAMP, or live server)
-# Import maha_gr.sql to your MySQL database
-# Update api/app_config.php with your database credentials
+#### 3. **Backend API Setup**
+
+1. **Copy API files to your web server:**
+   - Copy the `api/` folder to your web server directory (e.g., `C:\Program Files\Ampps\www\mahagrweb\api\`)
+
+2. **Database Setup:**
+   ```sql
+   -- Create database
+   CREATE DATABASE mahagr;
+   
+   -- Import schema
+   -- Run maha_gr(2).sql in your MySQL database
+   -- Run subject_master(1).sql for subject master data
+   ```
+
+3. **Configure Database Connection:**
+   - Update `api/connect.inc.php` with your database credentials:
+   ```php
+   $host = 'localhost';
+   $dbname = 'mahagr';
+   $username = 'your_username';
+   $password = 'your_password';
+   ```
+
+4. **Set File Permissions:**
+   - Ensure the `api/uploads/` directory has write permissions (chmod 755 or 777)
+
+#### 4. **App Configuration**
+
+Update `lib/reusable_or_snipit_widgets/app_config.dart` with your API base URL:
+
+```dart
+// For Android Emulator
+static const String _devBaseUrl = 'http://10.0.2.2/mahagrweb/api/';
+
+// For Physical Device (use your computer's IP)
+static const String _devBaseUrl = 'http://192.168.1.42/mahagrweb/api/';
+
+// For Production
+static const String _productionBaseUrl = 'https://mahagralert.com/crm/api/';
 ```
 
-#### 3. **Configuration**
-- Update `lib/reusable_or_snipit_widgets/app_config.dart` with your API base URL
-- Ensure database connection in `api/connect.inc.php`
-- Set proper file permissions for uploads directory
+**Finding Your IP Address:**
+- Windows: Run `ipconfig` in CMD
+- Mac/Linux: Run `ifconfig` in Terminal
 
-#### 4. **Run the app**
-```sh
+#### 5. **Run the App**
+```bash
+# Run on connected device/emulator
 flutter run
+
+# Build debug APK
+flutter build apk --debug
+
+# Build release APK
+flutter build apk --release
 ```
-
-### Assets
-
-- All images, PDFs, and data are located in the `assets/` directory and registered in `pubspec.yaml`
-- Sample documents are included in `assets/pdf_img_text/` for testing
 
 ---
 
-## 📡 Data Sources & APIs
+## 📡 API Configuration
 
-### ✅ **Implemented Backend APIs**
+### Environment Setup
 
-#### Authentication & User Management
-- **POST /api/login.php** - User authentication with email/password
-- **POST /api/register.php** - User registration
-- **POST /api/password_reset.php** - Password reset functionality
-- **POST /api/password_update.php** - Password update
-- **GET /api/users.php** - User listing and management
-- **POST /api/update_user_status.php** - User status management
-- **POST /api/admin_login.php** - Admin authentication
-- **GET /api/admin_users.php** - Admin user management
+The app supports multiple environments:
 
-#### Department & Category Management
-- **GET /api/departments.php** - List all departments
-- **GET /api/districts.php** - List all districts
-- **GET /api/categories.php** - List categories (with optional department filter)
-- **POST /api/add_category.php** - Add new category
-- **POST /api/update_category.php** - Update existing category
-- **POST /api/delete_category.php** - Delete category
+- **Development:** Local development with emulator/physical device
+- **Production:** Live server deployment
 
-#### Document Management
-- **GET /api/documents.php** - List documents with filters
-- **POST /api/document_upload.php** - Upload new documents
-- **POST /api/update_document.php** - Update document details
-- **POST /api/delete_document.php** - Delete documents
-- **POST /api/download_document.php** - Download documents
-- **GET /api/document_details.php** - Get document information
-- **GET /api/document_access_logs.php** - Track document access
+### API Base URLs
 
-#### Document Sharing & Collaboration
-- **POST /api/share_document.php** - Share documents with users
-- **GET /api/shared_document.php** - Get shared documents
+| Environment | URL | Usage |
+|------------|-----|-------|
+| Android Emulator | `http://10.0.2.2/mahagrweb/api/` | Default for emulator |
+| Physical Device | `http://YOUR_IP/mahagrweb/api/` | Use your computer's IP |
+| Production | `https://mahagralert.com/crm/api/` | Live server |
 
-#### Notifications & Feedback
-- **GET /api/notifications.php** - User notifications
-- **POST /api/suggestions.php** - Submit suggestions/feedback
+### Testing on Different Devices
 
-### 📊 **Database Schema**
+1. **Android Emulator:** Use `http://10.0.2.2/mahagrweb/api/`
+2. **Physical Android Device:** Use your computer's IP address
+3. **iOS Simulator:** Use `http://localhost/mahagrweb/api/`
+4. **Physical iOS Device:** Use your computer's IP address
+
+See `API_SETUP_GUIDE.md` for detailed configuration instructions.
+
+---
+
+## 📊 Database Schema
+
 The app uses a MySQL database with the following main tables:
+
 - `users` - User accounts and profiles
+- `admin_users` - Admin user accounts
 - `departments` - Department information
 - `districts` - District data
 - `categories` - Document categories
 - `documents` - Document metadata and files
 - `document_shares` - Document sharing records
+- `document_access_logs` - Document access tracking
 - `notifications` - User notifications
 - `suggestions` - User feedback
-- `document_access_logs` - Document access tracking
+- `audit_logs` - System audit logs
 
-### 🔒 **Security Features**
+See `maha_gr(2).sql` for complete database schema.
+
+---
+
+## 🔒 Security Features
+
 - Password hashing using MD5 (⚠️ **Security Alert:** Upgrade to bcrypt recommended - see `api_improvements.md`)
 - Prepared statements to prevent SQL injection
 - Input validation and sanitization
 - User status management (Active/Inactive)
 - Document access logging
 - Admin role-based access control
+- File upload validation (type and size)
 
 ### 🚨 **Security Recommendations**
+
 Based on the comprehensive API improvement analysis (see `api_improvements.md`):
+
 - **High Priority:** Upgrade password hashing from MD5 to bcrypt/Argon2
 - **High Priority:** Implement CSRF protection and rate limiting
 - **Medium Priority:** Add comprehensive input validation and sanitization
@@ -368,12 +382,6 @@ Based on the comprehensive API improvement analysis (see `api_improvements.md`):
 ---
 
 ## 🐛 Recent Bug Fixes & Improvements
-
-### **September 2025 - Comprehensive API Enhancement Plan**
-- **API Improvements Document:** Created detailed roadmap for API security, performance, and UX improvements
-- **Security Focus:** Identified need for password hashing upgrade from MD5 to bcrypt/Argon2
-- **Performance Optimization:** Database indexing, caching implementation, and pagination recommendations
-- **Enhanced Documentation:** Comprehensive API improvement guidelines and best practices
 
 ### **January 2025 - Login Authentication Fix**
 - **Issue:** Wrong passwords were incorrectly navigating to home page
@@ -386,11 +394,6 @@ Based on the comprehensive API improvement analysis (see `api_improvements.md`):
 - Better network connectivity testing
 - Improved response parsing and validation
 - Added comprehensive logging for debugging
-
-### **Code Quality Updates**
-- Cleaned up API response handling
-- Added proper error messages for different failure scenarios
-- Improved user feedback and validation
 
 ### **New Features Added**
 - Document sharing system
@@ -438,25 +441,50 @@ Based on the comprehensive API improvement analysis (see `api_improvements.md`):
 - ✅ Cross-platform compatibility
 - ✅ Admin panel functionality
 
-### **Known Issues**
-- None currently identified
-
 ---
 
 ## 🚀 Deployment
 
 ### **Mobile Apps**
-- Android: Build APK with `flutter build apk`
-- iOS: Build with Xcode for App Store distribution
+```bash
+# Android Debug APK
+flutter build apk --debug
+
+# Android Release APK
+flutter build apk --release
+
+# iOS (requires Xcode)
+flutter build ios --release
+```
 
 ### **Web App**
-- Build with `flutter build web`
-- Deploy to any web hosting service
+```bash
+flutter build web
+# Deploy to any web hosting service
+```
 
 ### **Desktop Apps**
-- Windows: `flutter build windows`
-- Linux: `flutter build linux`
-- macOS: `flutter build macos`
+```bash
+# Windows
+flutter build windows
+
+# Linux
+flutter build linux
+
+# macOS
+flutter build macos
+```
+
+---
+
+## 📚 Additional Documentation
+
+- **API Documentation:** See `API_DOCUMENTATION.md` for detailed API reference
+- **Quick Reference:** See `API_QUICK_REFERENCE.md` for common API calls
+- **Setup Guide:** See `API_SETUP_GUIDE.md` for backend setup
+- **API Improvements:** See `api_improvements.md` for enhancement recommendations
+- **Upload Features:** See `api/UPLOAD_FUNCTIONALITY.md` for document upload details
+- **Notifications:** See `NOTIFICATIONS_API_INTEGRATION.md` for notification system
 
 ---
 
@@ -469,6 +497,9 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 - Use meaningful commit messages
 - Test on multiple platforms before submitting
 - Update documentation for new features
+- Follow consistent naming conventions
+- Add error handling for non-trivial logic
+- Keep code efficient and token-optimized
 
 ---
 
@@ -506,44 +537,46 @@ This project is proprietary and intended for use by the Forest Department and au
 
 ---
 
-## 🏠 **Home Page Navigation Structure**
+## 🏗️ Build Requirements
 
-The Home Page serves as the central hub with **4 main navigation areas**:
-
-### **1. Department Grid (Main Content)**
-- **3x3 Grid Layout** displaying department logos and names
-- **Navigation Flow:** Home → Department Grid → Sub Departments → Sub-Sub Departments → Expandable List → GR List → Document Viewer
-- **Features:** Search functionality, date filtering, expandable department rows
-
-### **2. Home Page Band (Top Bar)**
-- **Notifications:** Access to system notifications
-- **Language Toggle:** Switch between English and Marathi
-- **Theme Toggle:** Change app appearance
-- **Share App:** Share the application
-
-### **3. Hamburger Menu (Left Drawer)**
-- **Profile Management:** Edit Profile, Saved Documents
-- **Legal Pages:** Privacy Policies, Refund Policies, Terms & Conditions, Disclaimer
-- **Support:** Contact Us
-
-### **4. App Bar More Menu (Top Right)**
-- **Customs Notifications:** Custom notification system
-- **Give Suggestions:** Submit feedback and suggestions
-- **Upload Documents:** Document upload functionality
-
-### **Key Navigation Patterns:**
-- **Department Flow:** Grid → List → Expandable → Documents → Viewers
-- **Settings Flow:** Profile → Preferences → Policies → Support
-- **Content Flow:** Upload → Validate → Process → Store → Share
-- **Search Flow:** Input → Filter → Results → Navigation
+- **Flutter SDK:** >=3.7.2
+- **Dart SDK:** Included with Flutter
+- **Android:** Minimum SDK 21, Target SDK 33+
+- **iOS:** iOS 12.0+
+- **PHP:** >=7.4
+- **MySQL:** >=5.7
 
 ---
 
-## 📚 Additional Documentation
+## ⚠️ Troubleshooting
 
-- **API Documentation:** See `API_DOCUMENTATION.md` for detailed API reference
-- **Quick Reference:** See `API_QUICK_REFERENCE.md` for common API calls
-- **Setup Guide:** See `API_SETUP_GUIDE.md` for backend setup
-- **API Improvements:** See `api_improvements.md` for enhancement recommendations
-- **Upload Features:** See `UPLOAD_FUNCTIONALITY.md` for document upload details
-- **Notifications:** See `NOTIFICATIONS_API_INTEGRATION.md` for notification system
+### Common Issues
+
+1. **"No internet connection" error**
+   - Check if your server is running
+   - Verify the IP address is correct in `app_config.dart`
+   - Ensure both device and computer are on same network
+
+2. **"Connection timeout" error**
+   - Check firewall settings
+   - Verify server is accessible from device
+   - Try using computer's IP instead of localhost
+
+3. **"Server error"**
+   - Check server logs
+   - Verify API endpoints are working
+   - Test with Postman or browser
+
+4. **Build errors on Windows**
+   - Enable Developer Mode for symlink support
+   - Run: `start ms-settings:developers`
+
+5. **Database connection errors**
+   - Verify database credentials in `api/connect.inc.php`
+   - Ensure MySQL service is running
+   - Check database exists and tables are created
+
+---
+
+**Last Updated:** January 2025  
+**Version:** 1.0.0+1

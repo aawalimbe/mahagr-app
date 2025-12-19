@@ -22,7 +22,7 @@ class _WelcomePageState extends State<WelcomePage> {
             Positioned(
               left: 0,
               right: 0,
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 height: 500.h,
                 child: Image.asset(

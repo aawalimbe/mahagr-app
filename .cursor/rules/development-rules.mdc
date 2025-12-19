@@ -1,0 +1,936 @@
+---
+alwaysApply: true
+---
+
+# Development Rules for MahaGR App
+
+## Table of Contents
+1. [General Principles](#general-principles)
+2. [Code Style & Conventions](#code-style--conventions)
+3. [File Structure & Organization](#file-structure--organization)
+4. [Naming Conventions](#naming-conventions)
+5. [State Management](#state-management)
+6. [API Integration](#api-integration)
+7. [Error Handling](#error-handling)
+8. [UI/UX Guidelines](#uiux-guidelines)
+9. [Security Practices](#security-practices)
+10. [Performance Optimization](#performance-optimization)
+11. [Testing Requirements](#testing-requirements)
+12. [Documentation Standards](#documentation-standards)
+13. [Git Workflow](#git-workflow)
+14. [Backend Development (PHP)](#backend-development-php)
+15. [Database Guidelines](#database-guidelines)
+
+---
+
+## General Principles
+
+### Code Quality
+- **Always write production-ready code** - No temporary hacks or TODOs without proper tracking
+- **Follow DRY (Don't Repeat Yourself)** - Refactor repetitive logic into reusable widgets/functions
+- **Keep functions small and focused** - Single responsibility principle
+- **Write self-documenting code** - Use clear variable and function names
+- **Optimize for token efficiency** - Write concise code without compromising clarity
+- **Test before committing** - Ensure code works on target platforms
+
+### Code Review Standards
+- All code must be reviewed before merging
+- Code should follow Flutter/Dart best practices
+- Ensure proper error handling is implemented
+- Verify UI responsiveness across different screen sizes
+- Check for memory leaks and performance issues
+
+---
+
+## Code Style & Conventions
+
+### Dart/Flutter Code Style
+
+#### Formatting
+- Use **2 spaces** for indentation (not tabs)
+- Maximum line length: **100 characters** (prefer 80 when possible)
+- Always run `dart format .` before committing
+- Use trailing commas in multi-line lists/maps for better diffs
+
+#### Imports
+- Group imports in this order:
+  1. Dart SDK imports (`dart:...`)
+  2. Flutter imports (`package:flutter/...`)
+  3. Package imports (`package:...`)
+  4. Relative imports (`./...`)
+- Use absolute imports for packages, relative imports for local files
+- Sort imports alphabetically within each group
+
+```dart
+// ✅ Good
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
+
+// ❌ Bad
+import 'package:flutter/material.dart';
+import 'dart:convert';
+import '../pages/home_page.dart';
+import 'package:provider/provider.dart';
+```
+
+#### Widget Structure
+- Always use `const` constructors when possible for performance
+- Extract complex widgets into separate methods or classes
+- Use `super.key` for StatefulWidget constructors
+- Dispose controllers and resources properly
+
+```dart
+// ✅ Good
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _mobileController = TextEditingController();
+  
+  @override
+  void dispose() {
+    _mobileController.dispose();
+    super.dispose();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(/* ... */);
+  }
+}
+
+// ❌ Bad
+class LoginPage extends StatefulWidget {
+  LoginPage();
+  
+  @override
+  State<LoginPage> createState() => LoginPageState();
+}
+```
+
+#### Comments
+- **Add comments only where logic is non-obvious** - Do not over-comment straightforward code
+- Use `//` for single-line comments
+- Use `///` for documentation comments on public APIs
+- Avoid commented-out code - Use version control instead
+
+```dart
+// ✅ Good - Explains why, not what
+// Temporarily pass mobile as email and otp as password
+// TODO: Update API to accept mobile directly
+final response = await ApiService.loginUser(
+  email: _mobileController.text.trim(),
+  password: _otpController.text.trim(),
+);
+
+// ❌ Bad - Obvious comment
+// Set loading state to true
+setState(() => _isLoading = true);
+```
+
+---
+
+## File Structure & Organization
+
+### Directory Structure
+```
+lib/
+├── main.dart                          # App entry point
+├── splash_screen.dart                 # Splash screen
+├── pages/                             # All screen/page widgets
+│   ├── [feature_name]_page.dart      # Page naming convention
+│   └── [feature_name].dart           # Alternative naming
+├── reusable_or_snipit_widgets/       # Shared/reusable components
+│   ├── api_service.dart              # API client
+│   ├── api_list.dart                 # API endpoints
+│   ├── app_config.dart               # App configuration
+│   ├── [widget_name].dart            # Reusable widgets
+└── test_connection.dart              # Utility files
+```
+
+### File Naming
+- **Pages:** Use `snake_case` with `_page.dart` suffix (e.g., `login_page.dart`, `home_page.dart`)
+- **Widgets:** Use `snake_case` (e.g., `app_text.dart`, `custom_scaffold.dart`)
+- **Services:** Use `snake_case` with descriptive names (e.g., `api_service.dart`)
+- **Models:** Use `snake_case` with `_model.dart` suffix if needed
+
+### File Organization Within Files
+1. Imports (grouped as specified)
+2. Class/Widget definition
+3. Private members (fields, controllers)
+4. Lifecycle methods (initState, dispose, etc.)
+5. Private methods
+6. Public methods
+7. Build method
+
+---
+
+## Naming Conventions
+
+### Variables & Fields
+- **Private fields:** Use `_` prefix with `camelCase` (e.g., `_isLoading`, `_mobileController`)
+- **Public fields:** Use `camelCase` (e.g., `userName`, `isActive`)
+- **Constants:** Use `camelCase` for local constants, `PascalCase` for class constants
+- **Booleans:** Use `is`, `has`, `should` prefix (e.g., `isLoading`, `hasError`)
+
+```dart
+// ✅ Good
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _mobileController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscureOTP = false;
+  
+  static const int maxRetries = 3;
+}
+
+// ❌ Bad
+class _LoginPageState extends State<LoginPage> {
+  final formKey = GlobalKey<FormState>();
+  final mobileController = TextEditingController();
+  bool loading = false;
+  bool obscure_otp = false;
+}
+```
+
+### Classes & Widgets
+- **Widgets:** Use `PascalCase` (e.g., `LoginPage`, `HomePage`)
+- **State classes:** Use `_` prefix + `PascalCase` (e.g., `_LoginPageState`)
+- **Services:** Use `PascalCase` with `Service` suffix (e.g., `ApiService`)
+- **Models:** Use `PascalCase` (e.g., `User`, `Document`)
+
+### Functions & Methods
+- **Public methods:** Use `camelCase` (e.g., `loginUser()`, `fetchDocuments()`)
+- **Private methods:** Use `_` prefix with `camelCase` (e.g., `_showError()`, `_loadDepartments()`)
+- **Async methods:** Use descriptive names ending with action (e.g., `loginUser()`, `fetchData()`)
+
+### API Endpoints
+- Use `snake_case` for endpoint names (e.g., `login.php`, `document_upload.php`)
+- Use RESTful naming conventions where applicable
+
+---
+
+## State Management
+
+### Provider Pattern (Current Standard)
+- Use `Provider` for state management across the app
+- Create separate provider classes for different concerns (Theme, Language, etc.)
+- Use `ChangeNotifier` for state that needs to notify listeners
+- Use `Consumer` or `Provider.of` to access providers in widgets
+
+```dart
+// ✅ Good - Provider pattern
+class ThemeProvider extends ChangeNotifier {
+  bool _isDarkMode = false;
+  
+  bool get isDarkMode => _isDarkMode;
+  
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    notifyListeners();
+  }
+}
+
+// Usage
+Consumer<ThemeProvider>(
+  builder: (context, themeProvider, _) {
+    return MaterialApp(
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+    );
+  },
+)
+```
+
+### Local State Management
+- Use `setState` for widget-local state only
+- Extract state to providers when shared across multiple widgets
+- Use `StatefulWidget` only when necessary
+
+### State Initialization
+- Initialize state in `initState()` method
+- Load data asynchronously in `initState()` using `Future`
+- Handle loading and error states properly
+
+```dart
+// ✅ Good
+@override
+void initState() {
+  super.initState();
+  _loadDepartments();
+}
+
+Future<void> _loadDepartments() async {
+  setState(() => _isLoading = true);
+  try {
+    final data = await ApiService.fetchDepartments();
+    setState(() {
+      _departments = data;
+      _isLoading = false;
+    });
+  } catch (e) {
+    setState(() {
+      _isLoading = false;
+      _error = e.toString();
+    });
+  }
+}
+```
+
+---
+
+## API Integration
+
+### API Service Pattern
+- **Always use `ApiService` class** for all API calls - Do not make direct HTTP requests
+- Define all endpoints in `api_list.dart`
+- Use `AppConfig.baseUrl` for base URL configuration
+- Handle errors consistently using `ApiService` error handling
+
+```dart
+// ✅ Good - Using ApiService
+try {
+  final response = await ApiService.loginUser(
+    email: email,
+    password: password,
+  );
+  
+  if (response["status"] == true) {
+    // Handle success
+  } else {
+    // Handle error
+  }
+} catch (e) {
+  // Handle exception
+}
+
+// ❌ Bad - Direct HTTP call
+final response = await http.post(
+  Uri.parse('http://localhost/api/login.php'),
+  body: json.encode({'email': email, 'password': password}),
+);
+```
+
+### API Response Handling
+- **Always check response status** before processing data
+- Handle both `status: true` and `status: "true"` string formats
+- Extract error messages from response
+- Show user-friendly error messages
+
+```dart
+// ✅ Good - Proper response handling
+final response = await ApiService.loginUser(email: email, password: password);
+final status = response["status"];
+final message = (response["message"] ?? "").toString();
+
+final isSuccess = status == true || status?.toString().toLowerCase() == "true";
+
+if (isSuccess) {
+  // Navigate to home
+} else {
+  _showError(message.isNotEmpty ? message : "Login failed.");
+}
+```
+
+### API Configuration
+- **Never hardcode API URLs** - Always use `AppConfig.baseUrl`
+- Update `app_config.dart` for different environments
+- Use environment-based configuration (development/production)
+
+```dart
+// ✅ Good
+static String get baseUrl => isDevelopment ? _devBaseUrl : _productionBaseUrl;
+
+// ❌ Bad
+final url = 'http://localhost/api/login.php';
+```
+
+### Network Error Handling
+- **Always wrap API calls in try-catch blocks**
+- Provide meaningful error messages to users
+- Log errors for debugging (when `AppConfig.enableLogging` is true)
+- Handle timeout, connection errors, and server errors separately
+
+```dart
+// ✅ Good - Comprehensive error handling
+try {
+  final response = await ApiService.loginUser(email: email, password: password);
+  // Process response
+} on DioException catch (e) {
+  _showError("Network error: ${e.message}");
+} catch (e) {
+  _showError("An unexpected error occurred: $e");
+} finally {
+  setState(() => _isLoading = false);
+}
+```
+
+---
+
+## Error Handling
+
+### General Error Handling Principles
+- **Never let errors fail silently** - Always log, raise, or handle errors explicitly
+- Use try-catch blocks for all async operations
+- Provide user-friendly error messages
+- Log technical details for debugging
+
+### Error Display
+- Use `ScaffoldMessenger` for showing error messages
+- Use `SnackBar` for temporary notifications
+- Use `AlertDialog` for critical errors requiring user action
+- Show loading states during async operations
+
+```dart
+// ✅ Good - User-friendly error handling
+void _showError(String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+      duration: const Duration(seconds: 3),
+    ),
+  );
+}
+
+// Usage
+try {
+  await ApiService.loginUser(email: email, password: password);
+} catch (e) {
+  _showError("Login failed. Please check your credentials and try again.");
+}
+```
+
+### Form Validation
+- Use `Form` widget with `GlobalKey<FormState>`
+- Implement `validator` functions for all form fields
+- Show validation errors inline
+- Prevent submission until form is valid
+
+```dart
+// ✅ Good - Form validation
+final _formKey = GlobalKey<FormState>();
+
+TextFormField(
+  controller: _emailController,
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    if (!value.contains('@')) {
+      return 'Please enter a valid email';
+    }
+    return null;
+  },
+)
+
+// Submit handler
+if (!_formKey.currentState!.validate()) return;
+```
+
+---
+
+## UI/UX Guidelines
+
+### Responsive Design
+- **Always use `flutter_screenutil`** for responsive sizing
+- Use `.sp` for font sizes, `.w` for widths, `.h` for heights
+- Set `designSize` in `ScreenUtilInit` (currently `Size(360, 800)`)
+- Test on different screen sizes
+
+```dart
+// ✅ Good - Responsive design
+ScreenUtilInit(
+  designSize: const Size(360, 800),
+  minTextAdapt: true,
+  splitScreenMode: true,
+  builder: (context, child) {
+    return MaterialApp(/* ... */);
+  },
+  child: const HomePage(),
+)
+
+// Usage in widgets
+Container(
+  padding: EdgeInsets.all(14.sp),
+  width: 100.w,
+  height: 50.h,
+  child: Text(
+    'Hello',
+    style: TextStyle(fontSize: 16.sp),
+  ),
+)
+```
+
+### Color Management
+- **Always use `AppColors` class** - Never hardcode colors
+- Use semantic color names (e.g., `primaryColor`, `errorDark`)
+- Support both light and dark themes
+- Define theme-specific colors in `AppColors`
+
+```dart
+// ✅ Good - Using AppColors
+Container(
+  color: AppColors.primaryColor,
+  child: Text(
+    'Hello',
+    style: TextStyle(color: AppColors.textOnLight),
+  ),
+)
+
+// ❌ Bad - Hardcoded colors
+Container(
+  color: Color(0xFF228B22),
+  child: Text('Hello'),
+)
+```
+
+### Theme Support
+- **Always support both light and dark themes**
+- Use `ThemeProvider` for theme management
+- Test UI in both theme modes
+- Use theme-aware colors
+
+```dart
+// ✅ Good - Theme support
+Consumer<ThemeProvider>(
+  builder: (context, themeProvider, _) {
+    return MaterialApp(
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
+      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+    );
+  },
+)
+```
+
+### Loading States
+- **Always show loading indicators** during async operations
+- Use `CircularProgressIndicator` for loading states
+- Disable buttons during loading to prevent duplicate requests
+- Show appropriate messages for different states (loading, success, error)
+
+```dart
+// ✅ Good - Loading state handling
+bool _isLoading = false;
+
+Future<void> _login() async {
+  setState(() => _isLoading = true);
+  try {
+    await ApiService.loginUser(email: email, password: password);
+  } finally {
+    setState(() => _isLoading = false);
+  }
+}
+
+// In build method
+_isLoading
+    ? const CircularProgressIndicator()
+    : ElevatedButton(
+        onPressed: _isLoading ? null : _login,
+        child: const Text('Login'),
+      )
+```
+
+### Navigation
+- Use `Navigator.push` for forward navigation
+- Use `Navigator.pushReplacement` when replacing current screen
+- Use `Navigator.pop` for going back
+- Pass data using constructor parameters, not global state
+
+```dart
+// ✅ Good - Navigation with parameters
+Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => SubSubDepartments(
+      subjectId: department['subject_id'],
+      departmentNameMar: department['name_mar'],
+      departmentNameEng: department['name_eng'],
+    ),
+  ),
+);
+```
+
+---
+
+## Security Practices
+
+### Authentication & Authorization
+- **Never store passwords in plain text** - Always hash passwords
+- Use secure storage for sensitive data (use `shared_preferences` appropriately)
+- Validate user input on both client and server side
+- Implement proper session management
+
+### Input Validation
+- **Validate all user inputs** before sending to API
+- Sanitize file uploads (type, size validation)
+- Use prepared statements in PHP (already implemented)
+- Prevent SQL injection (use PDO prepared statements)
+
+### API Security
+- **Never expose API credentials** in client code
+- Use HTTPS in production
+- Implement proper CORS policies
+- Validate API responses before processing
+
+### File Upload Security
+- Validate file types (only allow PDF, JPG, JPEG, PNG, DOC, DOCX)
+- Limit file size (currently 10MB)
+- Sanitize file names
+- Store files in secure directories
+
+```dart
+// ✅ Good - File validation
+if (file.size > 10 * 1024 * 1024) {
+  throw Exception('File size exceeds 10MB limit');
+}
+
+final allowedTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+if (!allowedTypes.contains(file.extension.toLowerCase())) {
+  throw Exception('Invalid file type');
+}
+```
+
+---
+
+## Performance Optimization
+
+### Widget Optimization
+- **Use `const` constructors** whenever possible
+- Extract complex widgets to prevent unnecessary rebuilds
+- Use `ListView.builder` for long lists instead of `ListView`
+- Avoid rebuilding entire widget tree unnecessarily
+
+```dart
+// ✅ Good - Const widgets
+const Text('Hello World')
+
+// ✅ Good - ListView.builder for long lists
+ListView.builder(
+  itemCount: _departments.length,
+  itemBuilder: (context, index) {
+    return DepartmentCard(department: _departments[index]);
+  },
+)
+```
+
+### Image Optimization
+- Use appropriate image formats (JPEG for photos, PNG for graphics)
+- Compress images before adding to assets
+- Use `cached_network_image` for network images (if package added)
+- Lazy load images when possible
+
+### Memory Management
+- **Always dispose controllers and resources**
+- Cancel subscriptions and timers
+- Avoid memory leaks in listeners
+- Use weak references when appropriate
+
+```dart
+// ✅ Good - Proper disposal
+class _LoginPageState extends State<LoginPage> {
+  final _mobileController = TextEditingController();
+  Timer? _timer;
+  
+  @override
+  void dispose() {
+    _mobileController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+```
+
+### Network Optimization
+- Cache API responses when appropriate
+- Implement pagination for large data sets
+- Use appropriate timeout values (currently 30 seconds)
+- Minimize API calls (batch requests when possible)
+
+---
+
+## Testing Requirements
+
+### Code Testing
+- Test critical user flows (login, registration, document upload)
+- Test error scenarios (network failures, invalid inputs)
+- Test on multiple screen sizes
+- Test in both light and dark themes
+
+### Manual Testing Checklist
+- [ ] User registration and login
+- [ ] Password reset functionality
+- [ ] Document viewing (PDF, images)
+- [ ] Document upload and management
+- [ ] Profile editing
+- [ ] Navigation flows
+- [ ] Error handling
+- [ ] Theme switching
+- [ ] Language switching
+- [ ] Responsive design on different devices
+
+### Testing Before Commit
+- Run `flutter analyze` to check for errors
+- Run `dart format .` to ensure proper formatting
+- Test on at least one physical device or emulator
+- Verify no console errors or warnings
+
+---
+
+## Documentation Standards
+
+### Code Documentation
+- **Add comments only where logic is non-obvious**
+- Document complex algorithms or business logic
+- Use `///` for public API documentation
+- Keep comments up-to-date with code changes
+
+### API Documentation
+- Document all API endpoints in `API_DOCUMENTATION.md`
+- Include request/response examples
+- Document error codes and messages
+- Keep API documentation synchronized with code
+
+### README Updates
+- Update README.md when adding new features
+- Document configuration changes
+- Include setup instructions for new dependencies
+- Document breaking changes
+
+---
+
+## Git Workflow
+
+### Branch Naming
+- Use descriptive branch names: `feature/[feature-name]`, `bugfix/[bug-name]`, `hotfix/[issue-name]`
+- Use lowercase with hyphens (e.g., `feature/user-authentication`, `bugfix/login-error`)
+
+### Commit Messages
+- Use clear, descriptive commit messages
+- Start with verb in imperative mood (e.g., "Add", "Fix", "Update")
+- Include relevant file names when applicable
+- Keep commits focused (one feature/fix per commit)
+
+```bash
+# ✅ Good commit messages
+git commit -m "Add forgot password functionality"
+git commit -m "Fix login authentication error"
+git commit -m "Update API service error handling"
+
+# ❌ Bad commit messages
+git commit -m "fixes"
+git commit -m "updated stuff"
+git commit -m "WIP"
+```
+
+### Pull Requests
+- Create pull requests for all changes
+- Include description of changes
+- Reference related issues
+- Ensure code passes all checks before requesting review
+
+### Code Review
+- Review all code before merging
+- Check for code style compliance
+- Verify error handling
+- Test functionality
+- Ensure documentation is updated
+
+---
+
+## Backend Development (PHP)
+
+### Code Style
+- Use PSR-12 coding standards
+- Use meaningful variable names
+- Add comments for complex logic
+- Keep functions focused and small
+
+### Database Access
+- **Always use PDO prepared statements** - Never use string concatenation for SQL
+- Use `connect.inc.php` for database connection
+- Handle database errors properly
+- Close database connections when done
+
+```php
+// ✅ Good - Prepared statements
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+$stmt->execute([$email]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// ❌ Bad - SQL injection vulnerability
+$query = "SELECT * FROM users WHERE email = '$email'";
+$result = mysqli_query($conn, $query);
+```
+
+### API Response Format
+- **Always return JSON responses**
+- Use consistent response structure: `{"status": true/false, "message": "...", "data": {...}}`
+- Include proper HTTP status codes
+- Handle errors gracefully
+
+```php
+// ✅ Good - Consistent response format
+header('Content-Type: application/json');
+echo json_encode([
+    'status' => true,
+    'message' => 'Login successful',
+    'user_id' => $user['user_id'],
+    'email' => $user['email']
+]);
+```
+
+### Input Validation
+- **Validate all inputs** before processing
+- Sanitize user inputs
+- Check for required fields
+- Validate data types and formats
+
+```php
+// ✅ Good - Input validation
+if (!isset($_POST['email']) || empty($_POST['email'])) {
+    echo json_encode(['status' => false, 'message' => 'Email is required']);
+    exit;
+}
+
+$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    echo json_encode(['status' => false, 'message' => 'Invalid email format']);
+    exit;
+}
+```
+
+### File Upload Handling
+- Validate file type and size
+- Sanitize file names
+- Store files in organized directory structure
+- Handle upload errors properly
+
+```php
+// ✅ Good - File upload validation
+$allowedTypes = ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'];
+$maxSize = 10 * 1024 * 1024; // 10MB
+
+if ($_FILES['file']['size'] > $maxSize) {
+    echo json_encode(['status' => false, 'message' => 'File size exceeds 10MB limit']);
+    exit;
+}
+
+$fileExtension = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+if (!in_array($fileExtension, $allowedTypes)) {
+    echo json_encode(['status' => false, 'message' => 'Invalid file type']);
+    exit;
+}
+```
+
+---
+
+## Database Guidelines
+
+### Table Naming
+- Use `snake_case` for table names (e.g., `users`, `document_access_logs`)
+- Use descriptive names that reflect the data stored
+- Use plural form for table names
+
+### Column Naming
+- Use `snake_case` for column names (e.g., `user_id`, `created_at`)
+- Use descriptive names
+- Use consistent naming patterns (e.g., `_id` for foreign keys, `_at` for timestamps)
+
+### Indexes
+- Add indexes on frequently queried columns
+- Index foreign keys
+- Index columns used in WHERE clauses
+
+### Migrations
+- **Always add SQL queries to SQL file** after running and approval
+- Document schema changes
+- Test migrations on development database first
+- Keep migration files organized
+
+### Data Integrity
+- Use foreign key constraints
+- Use appropriate data types
+- Set default values where appropriate
+- Use NOT NULL constraints for required fields
+
+---
+
+## Additional Guidelines
+
+### Dependencies
+- **Only install new libraries after approval or justification**
+- Keep dependencies up-to-date
+- Remove unused dependencies
+- Document why each dependency is needed
+
+### External CSS Files
+- **Always maintain external CSS files in a designated css folder**
+- Make separate CSS for each feature if needed
+- Keep all CSS files in the same folder
+- Use consistent naming conventions
+
+### SQL Queries
+- **Always read SQL file instead of assuming** database file names, table names, column names
+- **Always give SQL queries to run manually** - Don't execute automatically
+- **Add the SQL query to the SQL file** after it is run and approved
+
+### Error Logging
+- **Code must include basic error handling/logging** for any non-trivial logic or database interaction
+- Log errors with appropriate context
+- Use consistent logging format
+- Don't log sensitive information (passwords, tokens)
+
+### Code Efficiency
+- **Always code to burn as few tokens as possible** without compromising efficiency and accuracy
+- Avoid unnecessary code
+- Use efficient algorithms
+- Optimize loops and queries
+
+### Testing Files
+- **Never create testing files without asking**
+- Use existing test structure
+- Clean up test files after testing
+
+### README Files
+- **Create or update README files only when asked to do so**
+- Keep README concise and up-to-date
+- Include essential information only
+
+---
+
+## Summary Checklist
+
+Before submitting code, ensure:
+- [ ] Code follows Flutter/Dart style guidelines
+- [ ] All imports are properly organized
+- [ ] Error handling is implemented
+- [ ] Loading states are shown during async operations
+- [ ] UI is responsive using `flutter_screenutil`
+- [ ] Colors use `AppColors` class
+- [ ] Theme support (light/dark) is implemented
+- [ ] API calls use `ApiService` class
+- [ ] Form validation is implemented
+- [ ] Controllers are properly disposed
+- [ ] Code is tested on target platform
+- [ ] No hardcoded values (URLs, colors, etc.)
+- [ ] Comments are added only where necessary
+- [ ] Code is formatted (`dart format .`)
+- [ ] No linter errors (`flutter analyze`)
+- [ ] Git commit message is descriptive
+- [ ] Documentation is updated if needed
+
+---
+
+**Last Updated:** January 2025  
+**Version:** 1.0

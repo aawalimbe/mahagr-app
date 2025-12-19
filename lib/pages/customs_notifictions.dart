@@ -4,7 +4,6 @@ import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'dart:convert';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 
 class CustomsNotifictions extends StatefulWidget {
   const CustomsNotifictions({super.key});
@@ -101,6 +100,8 @@ class _CustomsNotifictionsState extends State<CustomsNotifictions> {
 }
 
 class DepartmentChecklist extends StatefulWidget {
+  const DepartmentChecklist({super.key});
+
   @override
   _DepartmentChecklistState createState() => _DepartmentChecklistState();
 }
