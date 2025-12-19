@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/deptselection_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/saved_docs.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/pdf_viewer.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/gr_list.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
+import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 
 void main() {
+  // Initialize API service
+  ApiService.initialize();
+
+  // Test online connection
+  testOnlineConnection();
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LanguageProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -29,19 +43,21 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
-          title: 'Forest Department GR and Updates App Demo',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: AppColors.primaryColor,
-            ),
-            checkboxTheme: CheckboxThemeData(shape: CircleBorder()),
-          ),
-          home: child,
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, _) {
+            return MaterialApp(
+              title: 'Forest Department GR and Updates App Demo',
+              debugShowCheckedModeBanner: false,
+              theme: themeProvider.lightTheme,
+              darkTheme: themeProvider.darkTheme,
+              themeMode:
+                  themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+              home: child,
+            );
+          },
         );
       },
-      child: const GrList(),
+      child: const SubDept(),
     );
   }
 }

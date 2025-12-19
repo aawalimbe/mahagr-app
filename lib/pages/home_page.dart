@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/sub_departments.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'dart:convert';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/home_page_band.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
                               crossAxisCount: 3,
                               crossAxisSpacing: 13,
                               mainAxisSpacing: 13,
-                              childAspectRatio: 0.8,
+                              childAspectRatio: 0.74,
                             ),
                         itemCount: _departments.length,
                         itemBuilder: (context, index) {
@@ -65,51 +66,91 @@ class _HomePageState extends State<HomePage> {
 
                           final lang =
                               Provider.of<LanguageProvider>(context).language;
-                          final name =
+                          final fullName =
                               lang == 'mar'
                                   ? (department['name_mar'] ?? '')
                                   : (department['name_eng'] ?? '');
+                          final words = fullName.split(' ');
+                          final name =
+                              words.length > 1
+                                  ? '${words.sublist(0, words.length - 1).join(' ')}\n${words.last}'
+                                  : fullName;
                           return InkWell(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const SubDepartments(),
+                                  builder:
+                                      (context) => SubSubDepartments(
+                                        subjectId:
+                                            int.tryParse(
+                                              '${department['subject_id']}',
+                                            ) ??
+                                            0,
+                                        departmentNameMar:
+                                            (department['name_mar'] ?? '')
+                                                .toString(),
+                                        departmentNameEng:
+                                            (department['name_eng'] ?? '')
+                                                .toString(),
+                                      ),
                                 ),
                               );
                             },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25.r),
-                                border: Border.all(
-                                  color: AppColors.primaryColor,
-                                  width: 2.5.w,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey,
-                                    blurRadius: 6,
-                                    offset: const Offset(4, 4),
+                            child: Consumer<ThemeProvider>(
+                              builder: (context, themeProvider, child) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        themeProvider.isDarkMode
+                                            ? AppColors.darkCardColor
+                                            : Colors.white,
+                                    borderRadius: BorderRadius.circular(25.r),
+                                    border: Border.all(
+                                      color:
+                                          themeProvider.isDarkMode
+                                              ? AppColors.darkPrimaryColor
+                                              : AppColors.primaryColor,
+                                      width: 2.5.w,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color:
+                                            themeProvider.isDarkMode
+                                                ? Colors.black.withOpacity(0.3)
+                                                : AppColors.border,
+                                        blurRadius: 6,
+                                        offset: const Offset(4, 4),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Image.asset(
-                                    department['logo'],
-                                    width: 60.w,
-                                    height: 60.w,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        department['logo'],
+                                        width: 60.w,
+                                        height: 60.w,
+                                      ),
+                                      SizedBox(height: 5.h),
+                                      Text(
+                                        name,
+                                        textAlign: TextAlign.center,
+                                        //overflow: TextOverflow.ellipsis,
+                                        style: AppTextStyles.regular(
+                                          lang == 'mar' ? 14.sp : 12.sp,
+                                        ).copyWith(
+                                          color:
+                                              themeProvider.isDarkMode
+                                                  ? AppColors
+                                                      .darkTextPrimaryColor
+                                                  : AppColors.textOnLight,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(height: 5.h),
-                                  Text(
-                                    name,
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.medium(lang=='mar'?16.sp:12.sp),
-                                  ),
-                                ],
-                              ),
+                                );
+                              },
                             ),
                           );
                         },

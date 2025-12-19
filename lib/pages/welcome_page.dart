@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/splash_screen.dart';
 
 class WelcomePage extends StatefulWidget {
@@ -58,11 +59,9 @@ class _WelcomePageState extends State<WelcomePage> {
                     children: [
                       Text(
                         "Welcome to महाGR Alert",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22.sp,
-                        ),
+                        style: AppTextStyles.bold(
+                          22.sp,
+                        ).copyWith(color: AppColors.textOnDark),
                       ),
                       SizedBox(height: 14.h),
                       Container(
@@ -71,23 +70,23 @@ class _WelcomePageState extends State<WelcomePage> {
                           vertical: 6.h,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.yellow[700],
+                          color: AppColors.yellow,
                           borderRadius: BorderRadius.circular(8.sp),
                         ),
                         child: Text(
                           "Trial Plan",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.sp,
-                          ),
+                          style: AppTextStyles.bold(
+                            16.sp,
+                          ).copyWith(color: AppColors.textOnLight),
                         ),
                       ),
                       SizedBox(height: 14.h),
                       Text(
                         "Enjoy unlimited access\nwith trial plan",
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 16.sp),
+                        style: AppTextStyles.regular(
+                          16.sp,
+                        ).copyWith(color: AppColors.textOnDark),
                       ),
                       SizedBox(height: 24.h),
                       SizedBox(
@@ -105,10 +104,10 @@ class _WelcomePageState extends State<WelcomePage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.sp),
                               ),
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
+                              backgroundColor: AppColors.transparent,
+                              shadowColor: AppColors.transparent,
                               elevation: 0,
-                              foregroundColor: Colors.white,
+                              foregroundColor: AppColors.textOnDark,
                             ),
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -120,10 +119,7 @@ class _WelcomePageState extends State<WelcomePage> {
                             },
                             child: Text(
                               "Get started",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18.sp,
-                              ),
+                              style: AppTextStyles.bold(18.sp),
                             ),
                           ),
                         ),

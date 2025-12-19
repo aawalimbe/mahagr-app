@@ -1,53 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/deptselection_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
-// import 'package:http/http.dart' as http;
-// import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 
-// UserProfile model for serialization/deserialization
-/*
-class UserProfile {
-  final String name;
-  final String email;
-  final String mobile;
-  final String district;
-  final String userType;
-  final String? department;
-
-  UserProfile({
-    required this.name,
-    required this.email,
-    required this.mobile,
-    required this.district,
-    required this.userType,
-    this.department,
-  });
-
-  factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      mobile: json['mobile'] ?? '',
-      district: json['district'] ?? '',
-      userType: json['userType'] ?? '',
-      department: json['department'],
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'email': email,
-        'mobile': mobile,
-        'district': district,
-        'userType': userType,
-        'department': department,
-      };
-}
-*/
 class EditProfile extends StatefulWidget {
   const EditProfile({super.key});
 
@@ -57,198 +14,195 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameCtrl = TextEditingController();
-  final TextEditingController _emailCtrl = TextEditingController();
-  final TextEditingController _mobileCtrl = TextEditingController();
+  final _nameCtrl = TextEditingController();
+  final _emailCtrl = TextEditingController();
+  final _mobileCtrl = TextEditingController();
 
   String? _selectedUserType;
-  String? _selectedDepartment;
   String? _selectedDistrict;
-  List<String> _departments = [];
+  String? _selectedDepartment;
+
   List<String> _districts = [];
-  bool _isLoadingDept = false;
-  bool _isLoadingProfile = false;
-  String? _errorMsg;
+  List<String> _departments = [];
+
+  bool _isLoading = false;
 
   final List<String> _userTypes = [
     'Govt Officer/Employee',
-    'NGO',
-    'Advocate/Lawyer',
+    'Semi-Govt Officer/Employee',
+    'Legal Field',
     "People's Representatives",
+    'Social Field/NGO',
     'Citizen',
-    'Other',
   ];
 
-  InputDecoration buildDecoration(String label) {
-    return InputDecoration(
-      labelStyle: AppTextStyles.regular(16.sp),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20.r),
-        borderSide: BorderSide(color: AppColors.primaryColor, width: 1.5.w),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20.r),
-        borderSide: BorderSide(color: AppColors.dprimaryColor, width: 3.w),
-      ),
-    );
-  }
+  OutlineInputBorder get _outlineBorder => OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8.r),
+    borderSide: BorderSide(color: AppColors.primaryColor),
+  );
 
-  Future<List<String>> fetchDepartments() async {
-    // TODO: Replace with real backend call
-    await Future.delayed(const Duration(seconds: 1));
-    return ['Forest', 'Revenue', 'Police', 'Education', 'Health'];
-  }
+  OutlineInputBorder get _focusedBorder => _outlineBorder.copyWith(
+    borderRadius: BorderRadius.circular(8.r),
+    borderSide: BorderSide(color: AppColors.dprimaryColor, width: 2.5),
+  );
 
-  void _onUserTypeChanged(String? value) async {
-    setState(() {
-      _selectedUserType = value;
-      _selectedDepartment = null;
-      _selectedDistrict = null;
-      _departments = [];
-    });
-    if (value == 'Govt Officer/Employee') {
-      setState(() {
-        _isLoadingDept = true;
-      });
-      final depts = await fetchDepartments();
-      setState(() {
-        _departments = depts;
-        _isLoadingDept = false;
-      });
-    }
+  void _showError(String msg) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
   }
-
-  // Fetch user profile from backend (replace URL with real endpoint)
-  /*
-  Future<void> fetchUserProfile() async {
-    setState(() {
-      _isLoadingProfile = true;
-      _errorMsg = null;
-    });
-    try {
-      // TODO: Replace with your real API endpoint
-      final response = await http.get(Uri.parse('https://example.com/api/profile'));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final profile = UserProfile.fromJson(data);
-        setState(() {
-          _nameCtrl.text = profile.name;
-          _emailCtrl.text = profile.email;
-          _mobileCtrl.text = profile.mobile;
-          _selectedDistrict = profile.district;
-          _selectedUserType = profile.userType;
-          _selectedDepartment = profile.department;
-        });
-        if (profile.userType == 'Govt Officer/Employee') {
-          final depts = await fetchDepartments();
-          setState(() {
-            _departments = depts;
-          });
-        }
-      } else {
-        setState(() {
-          _errorMsg = 'Failed to load profile.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMsg = 'Error: ${e.toString()}';
-      });
-    } finally {
-      setState(() {
-        _isLoadingProfile = false;
-      });
-    }
-  }
-  */
-
-  // Update user profile to backend (replace URL with real endpoint)
-  /*
-  Future<void> updateUserProfile() async {
-    setState(() {
-      _isLoadingProfile = true;
-      _errorMsg = null;
-    });
-    final profile = UserProfile(
-      name: _nameCtrl.text,
-      email: _emailCtrl.text,
-      mobile: _mobileCtrl.text,
-      district: _selectedDistrict ?? '',
-      userType: _selectedUserType ?? '',
-      department: _selectedUserType == 'Govt Officer/Employee' ? _selectedDepartment : null,
-    );
-    try {
-      // TODO: Replace with your real API endpoint
-      final response = await http.put(
-        Uri.parse('https://example.com/api/profile/update'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(profile.toJson()),
-      );
-      if (response.statusCode == 200) {
-        // Success: Optionally show a message or navigate
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
-        // Navigate to HomePage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        setState(() {
-          _errorMsg = 'Failed to update profile.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMsg = 'Error: ${e.toString()}';
-      });
-    } finally {
-      setState(() {
-        _isLoadingProfile = false;
-      });
-    }
-  }
-  */
 
   @override
   void initState() {
     super.initState();
     _loadDistricts();
-    // fetchUserProfile();
   }
 
   Future<void> _loadDistricts() async {
-    final String response = await rootBundle.loadString(
-      'assets/data/data.json',
-    );
-    final data = await json.decode(response);
-    setState(() {
-      _districts = List<String>.from(data['districts'].map((d) => d['name']));
-    });
+    try {
+      final result = await ApiService.getDistricts();
+      setState(() {
+        _districts = result.map((d) => d['name'] as String).toList();
+      });
+    } catch (_) {
+      _showError("Failed to load Districts");
+    }
   }
 
-  Widget compulsoryLabel(String label, {String? subtitle}) {
+  Future<void> _registerUser() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await ApiService.registerUser(
+        name: _nameCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        password: "", // Password removed from UI
+        mobile: _mobileCtrl.text.trim(),
+        userType: _selectedUserType!,
+        district: _selectedDistrict!,
+        department: _selectedDepartment,
+      );
+
+      if (response['status'] == 'true') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Registration successful!'),
+            backgroundColor: AppColors.vibrantgreen,
+          ),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DepartmentSelectionPage()),
+        );
+      } else {
+        _showError(response['message'] ?? 'Registration failed');
+      }
+    } catch (e) {
+      _showError('Error: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Widget _buildRequiredField(
+    String label,
+    TextEditingController controller, {
+    TextInputType? keyboardType,
+    int? maxLength,
+    String? subtitle,
+    String? Function(String?)? validator,
+    double bottomSpacing = 16,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomSpacing.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildLabel(label),
+          if (subtitle != null)
+            Padding(
+              padding: EdgeInsets.only(top: 2, bottom: 4),
+              child: Text(
+                subtitle,
+                style: AppTextStyles.regular(
+                  11.sp,
+                ).copyWith(color: AppColors.secondaryText),
+              ),
+            ),
+          SizedBox(height: 8.h),
+          TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            maxLength: maxLength,
+            validator:
+                validator ??
+                (v) =>
+                    (v == null || v.trim().isEmpty)
+                        ? "$label is required"
+                        : null,
+            decoration: InputDecoration(
+              border: _outlineBorder,
+              enabledBorder: _outlineBorder,
+              focusedBorder: _focusedBorder,
+              counterText: "",
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12.w,
+                vertical: 12.h,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLabel(String text) {
+    return Row(
+      children: [
+        Text(text, style: AppTextStyles.medium(14.sp)),
+        SizedBox(width: 4.w),
+        Container(
+          width: 6.w,
+          height: 6.h,
+          decoration: BoxDecoration(
+            color: AppColors.compulsory,
+            shape: BoxShape.circle,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDepartmentField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(label, style: AppTextStyles.bold(18.sp)),
-            const SizedBox(width: 4),
-            const Text('*', style: TextStyle(color: Colors.red, fontSize: 18)),
-          ],
-        ),
-        if (subtitle != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 2.0, bottom: 4.0),
-            child: Text(
-              subtitle,
-              style: AppTextStyles.regular(
-                14.sp,
-              ).copyWith(color: Colors.grey[700]),
+        _buildLabel("Department"),
+        SizedBox(height: 8.h),
+        TextFormField(
+          controller: TextEditingController(text: _selectedDepartment),
+          onChanged: (v) => _selectedDepartment = v,
+          decoration: InputDecoration(
+            border: _outlineBorder,
+            enabledBorder: _outlineBorder,
+            focusedBorder: _focusedBorder,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 12.w,
+              vertical: 12.h,
             ),
           ),
+          validator: (value) {
+            if (_selectedUserType == 'Govt Officer/Employee' ||
+                _selectedUserType == 'Semi-Govt Officer/Employee') {
+              if (value == null || value.isEmpty) {
+                return 'Department is required';
+              }
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: 16.h),
       ],
     );
   }
@@ -259,178 +213,151 @@ class _EditProfileState extends State<EditProfile> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          toolbarHeight: 70.h,
           backgroundColor: AppColors.primaryColor,
           centerTitle: true,
           title: Text(
             'Edit Profile',
-            style: AppTextStyles.bold(
-              26.sp,
-            ).copyWith(color: Colors.white, fontWeight: FontWeight.w900),
+            style: AppTextStyles.bold(20.sp).copyWith(
+              color: AppColors.textOnDark,
+              fontWeight: FontWeight.w900,
+            ),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: SingleChildScrollView(
-            child: Container(
-              margin: EdgeInsets.only(top: 15.h, left: 15.w, right: 15.w),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(15.w),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: compulsoryLabel(
-                        'Full Name',
-                        subtitle:
-                            "Surname - First Name - Father's/Husband's Name",
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    TextFormField(
-                      controller: _nameCtrl,
-                      decoration: buildDecoration('Full Name'),
-                      validator:
-                          (value) => value!.isEmpty ? 'Enter full name' : null,
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: compulsoryLabel('Email Id'),
-                    ),
-                    SizedBox(height: 4.h),
-                    TextFormField(
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: buildDecoration('Email Id'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty)
-                          return 'Enter valid email id';
-                        final emailRegex = RegExp(
-                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                        );
-                        if (!emailRegex.hasMatch(value))
-                          return 'Enter valid email id';
-                        return null;
-                      },
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: compulsoryLabel('Mobile No.'),
-                    ),
-                    SizedBox(height: 4.h),
-                    TextFormField(
-                      controller: _mobileCtrl,
-                      keyboardType: TextInputType.phone,
-                      maxLength: 10,
-                      decoration: buildDecoration('Mobile No.'),
-                      validator:
-                          (value) =>
-                              value == null || value.length != 10
-                                  ? 'Enter 10-digit mobile no.'
-                                  : null,
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: compulsoryLabel('District'),
-                    ),
-                    SizedBox(height: 4.h),
-                    DropdownButtonFormField<String>(
-                      value: _selectedDistrict,
-                      decoration: buildDecoration('District'),
-                      items:
-                          _districts
-                              .map(
-                                (dist) => DropdownMenuItem(
-                                  value: dist,
-                                  child: Text(dist),
-                                ),
-                              )
-                              .toList(),
-                      onChanged:
-                          (val) => setState(() => _selectedDistrict = val),
-                      validator:
-                          (value) => value == null ? 'Select district' : null,
-                    ),
-                    SizedBox(height: 20.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: compulsoryLabel('User Type'),
-                    ),
-                    SizedBox(height: 4.h),
-                    DropdownButtonFormField<String>(
-                      value: _selectedUserType,
-                      decoration: buildDecoration('User Type'),
-                      items:
-                          _userTypes
-                              .map(
-                                (type) => DropdownMenuItem(
-                                  value: type,
-                                  child: Text(type),
-                                ),
-                              )
-                              .toList(),
-                      onChanged: _onUserTypeChanged,
-                      validator:
-                          (value) => value == null ? 'Select user type' : null,
-                    ),
-                    if (_selectedUserType == 'Govt Officer/Employee') ...[
-                      SizedBox(height: 20.h),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: compulsoryLabel('Department'),
-                      ),
-                      SizedBox(height: 4.h),
-                      _isLoadingDept
-                          ? const CircularProgressIndicator()
-                          : DropdownButtonFormField<String>(
-                            value: _selectedDepartment,
-                            decoration: buildDecoration('Department'),
-                            items:
-                                _departments
-                                    .map(
-                                      (dept) => DropdownMenuItem(
-                                        value: dept,
-                                        child: Text(dept),
-                                      ),
-                                    )
-                                    .toList(),
-                            onChanged:
-                                (val) =>
-                                    setState(() => _selectedDepartment = val),
-                            validator:
-                                (value) =>
-                                    value == null ? 'Select department' : null,
-                          ),
-                    ],
-                    SizedBox(height: 30.h),
-                    ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomePage(),
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                      child: Text(
-                        'Update Profile',
-                        style: AppTextStyles.bold(
-                          20.sp,
-                        ).copyWith(color: Colors.white),
-                      ),
+                    Text(
+                      'Please fill the Information in English only',
+                      style: AppTextStyles.bold(
+                        12.sp,
+                      ).copyWith(color: AppColors.compulsory),
                     ),
                   ],
                 ),
-              ),
+                SizedBox(height: 8.h),
+                _buildRequiredField(
+                  'Full Name',
+                  _nameCtrl,
+                  subtitle: "Surname - First Name - Father's/Husband's Name",
+                ),
+
+                _buildRequiredField(
+                  'Email Id',
+                  _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Enter valid email id';
+                    }
+                    final emailRegex = RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    );
+                    if (!emailRegex.hasMatch(value)) {
+                      return 'Enter valid email id';
+                    }
+                    return null;
+                  },
+                ),
+
+                _buildRequiredField(
+                  'Mobile No.',
+                  _mobileCtrl,
+                  keyboardType: TextInputType.phone,
+                  maxLength: 10,
+                  validator:
+                      (value) =>
+                          value != null && value.length == 10
+                              ? null
+                              : 'Enter 10-digit mobile number',
+                ),
+
+                // DISTRICT
+                _buildLabel("District"),
+                SizedBox(height: 8.h),
+                DropdownButtonFormField<String>(
+                  value: _selectedDistrict,
+                  items:
+                      _districts
+                          .map(
+                            (d) => DropdownMenuItem(value: d, child: Text(d)),
+                          )
+                          .toList(),
+                  decoration: InputDecoration(
+                    border: _outlineBorder,
+                    enabledBorder: _outlineBorder,
+                    focusedBorder: _focusedBorder,
+                  ),
+                  validator: (v) => v == null ? 'Select district' : null,
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedUserType = v;
+                      _selectedDepartment = null;
+                    });
+                  },
+                ),
+
+                SizedBox(height: 20.h),
+
+                // USER TYPE
+                _buildLabel("User Type"),
+                SizedBox(height: 8.h),
+                DropdownButtonFormField<String>(
+                  value: _selectedUserType,
+                  items:
+                      _userTypes
+                          .map(
+                            (t) => DropdownMenuItem(value: t, child: Text(t)),
+                          )
+                          .toList(),
+                  decoration: InputDecoration(
+                    border: _outlineBorder,
+                    enabledBorder: _outlineBorder,
+                    focusedBorder: _focusedBorder,
+                  ),
+                  validator: (v) => v == null ? 'Select user type' : null,
+                  onChanged: (v) {
+                    setState(() {
+                      _selectedUserType = v;
+                      _selectedDepartment = null; // reset dept field
+                    });
+                  },
+                ),
+
+                // Conditional Display of DEPARTMENT FIELD
+                if (_selectedUserType == 'Govt Officer/Employee' ||
+                    _selectedUserType == 'Semi-Govt Officer/Employee') ...[
+                  SizedBox(height: 20.h),
+                  _buildDepartmentField(),
+                ],
+                SizedBox(height: 30.h),
+
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _registerUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryColor,
+                    minimumSize: Size(double.infinity, 48.h),
+                  ),
+                  child:
+                      _isLoading
+                          ? CircularProgressIndicator(
+                            color: AppColors.textOnDark,
+                          )
+                          : Text(
+                            'Update',
+                            style: AppTextStyles.bold(
+                              18.sp,
+                            ).copyWith(color: AppColors.textOnDark),
+                          ),
+                ),
+
+                SizedBox(height: 40.h),
+              ],
             ),
           ),
         ),

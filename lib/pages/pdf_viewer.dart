@@ -1,17 +1,24 @@
 import 'dart:io';
-import 'package:dio/dio.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/viewer_bottomNevigator.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_list.dart';
 
 class PdfViewer extends StatefulWidget {
-  const PdfViewer({super.key});
+  final String pdfUrl;
+  final String documentTitle;
+
+  const PdfViewer({
+    super.key,
+    required this.pdfUrl,
+    required this.documentTitle,
+  });
 
   @override
   State<PdfViewer> createState() => _PdfViewerState();
@@ -19,57 +26,78 @@ class PdfViewer extends StatefulWidget {
 
 class _PdfViewerState extends State<PdfViewer> {
   PdfControllerPinch? _pdfController;
-  bool _isPortrait = true;
-  File? _downloadedFile;
-  bool _isloading = true;
+  bool _isLoading = true;
   String? _error;
+  File? _downloadedFile;
 
-  final String pdfApiUrl = 'our url';
-  final String pdfFileName = 'our file name';
+  bool _isPortrait = true;
+  bool _isDownloading = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchAndLoadPdf();
+    _loadPDF();
   }
 
-  Future<void> _fetchAndLoadPdf() async {
+  Future<void> _loadPDF() async {
     try {
-      // Old API download code commented out for now
-      /*
-      final response = await Dio().get(
-        pdfApiUrl,
-        options: Options(responseType: ResponseType.bytes),
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final dir = await getApplicationDocumentsDirectory();
+      final sanitizedName = widget.documentTitle.replaceAll(
+        RegExp(r"[^\w\s-]"),
+        "",
+      );
+      final file = File("${dir.path}/$sanitizedName.pdf");
+
+      final bytes = await ApiService.downloadFilefromUrl(widget.pdfUrl);
+      await file.writeAsBytes(bytes);
+      _downloadedFile = file;
+
+      // FIX: Correct PdfX usage for your version
+      _pdfController = PdfControllerPinch(
+        document: PdfDocument.openFile(file.path), // <-- this is correct
       );
 
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File(' [dir.path}/$pdfFileName');
-      await file.writeAsBytes(response.data);
-
-      final document = PdfDocument.openFile(file.path);
-      */
-      // Load PDF from assets for now
-      final bytes = await rootBundle.load('assets/data/Document(100).pdf');
-      final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/Document(100).pdf');
-      await file.writeAsBytes(bytes.buffer.asUint8List());
-
-      final document = PdfDocument.openFile(file.path);
-
-      setState(() {
-        _downloadedFile = file;
-        _pdfController = PdfControllerPinch(document: document);
-        _isloading = false;
-      });
+      setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
-        _error = 'Error loading PDF: $e';
-        _isloading = false;
+        _isLoading = false;
+        _error = "Error loading PDF: $e";
       });
     }
   }
 
-  void _toggleOrientation() async {
+  Future<void> _share() async {
+    if (_downloadedFile != null) {
+      await Share.shareXFiles([
+        XFile(_downloadedFile!.path),
+      ], text: "Sharing: ${widget.documentTitle}");
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("File not ready")));
+    }
+  }
+
+  Future<void> _download() async {
+    if (_downloadedFile == null) return;
+
+    setState(() => _isDownloading = true);
+
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("PDF saved at: ${_downloadedFile!.path}")),
+    );
+
+    setState(() => _isDownloading = false);
+  }
+
+  void _rotate() async {
     if (_isPortrait) {
       await SystemChrome.setPreferredOrientations([
         DeviceOrientation.landscapeLeft,
@@ -81,33 +109,8 @@ class _PdfViewerState extends State<PdfViewer> {
         DeviceOrientation.portraitDown,
       ]);
     }
-    setState(() {
-      _isPortrait = !_isPortrait;
-    });
-  }
 
-  Future<void> _shareFile() async {
-    if (_downloadedFile != null) {
-      await Share.shareXFiles([
-        XFile(_downloadedFile!.path),
-      ], text: 'Sharing PDF file');
-    } else {
-      _showSnack('Please wait for the PDF to load');
-    }
-  }
-
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  Future<void> _downloadFile() async {
-    if (_downloadedFile != null) {
-      _showSnack('File Downloaded to : ${_downloadedFile!.path}');
-    } else {
-      _showSnack('File not downloaded yet');
-    }
+    setState(() => _isPortrait = !_isPortrait);
   }
 
   @override
@@ -125,101 +128,28 @@ class _PdfViewerState extends State<PdfViewer> {
     return SafeArea(
       child: CustomScaffold(
         body:
-            _isloading
+            _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _error != null
-                ? Center(child: Text(_error!))
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_error!, style: const TextStyle(color: Colors.red)),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: _loadPDF,
+                        child: const Text("Retry"),
+                      ),
+                    ],
+                  ),
+                )
                 : PdfViewPinch(controller: _pdfController!),
-        bottomNavigationBar: Container(
-          color: AppColors.primaryColor,
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                  );
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.home, color: Colors.white),
-                    SizedBox(height: 4),
-                    Text(
-                      'Home',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: _shareFile,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.share, color: Colors.white),
-                    SizedBox(height: 4),
-                    Text(
-                      'Share',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: _downloadFile,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.download, color: Colors.white),
-                    SizedBox(height: 4),
-                    Text(
-                      'Download',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: _toggleOrientation,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.screen_rotation, color: Colors.white),
-                    SizedBox(height: 4),
-                    Text(
-                      'Rotate',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SubSubDepartments(),
-                    ),
-                  );
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.arrow_back_outlined, color: Colors.white),
-                    SizedBox(height: 4),
-                    Text(
-                      'Back',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+
+        bottomNavigationBar: ViewerBottomNavigator(
+          onShare: _share,
+          onDownload: _isDownloading ? () {} : _download,
+          onRotate: _rotate,
         ),
       ),
     );

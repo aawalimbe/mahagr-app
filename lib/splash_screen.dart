@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const NewRegistration()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     });
   }
@@ -27,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.textOnDark,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -41,7 +42,6 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 270.w,
               height: 270.w,
             ),
-            
           ],
         ),
       ),

@@ -19,25 +19,19 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
       child: Scaffold(
         backgroundColor: AppColors.backgroundColor,
         appBar: AppBar(
-          toolbarHeight: 90,
+          toolbarHeight: 60,
           backgroundColor: AppColors.primaryColor,
           centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white, size: 35),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
-            },
-          ),
+          iconTheme: IconThemeData(color: AppColors.textOnDark, size: 30.sp),
           title: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Terms and Conditions for महाGR Alert Mobile Application',
+                'Terms and Conditions ',
                 textAlign: TextAlign.start,
-                style: AppTextStyles.bold(24.sp).copyWith(color: Colors.white),
+                style: AppTextStyles.bold(
+                  16.sp,
+                ).copyWith(color: AppColors.textOnDark),
                 softWrap: true,
                 maxLines: 2,
               ),
@@ -118,14 +112,14 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: EdgeInsets.only(top: 20.h, bottom: 8.h),
-      child: Text(title, style: AppTextStyles.bold(17.sp)),
+      child: Text(title, style: AppTextStyles.bold(13.sp)),
     );
   }
 
   Widget _buildSectionText(String content) {
     return Text(
       content,
-      style: AppTextStyles.regular(16.sp),
+      style: AppTextStyles.regular(12.sp),
       textAlign: TextAlign.justify,
     );
   }
