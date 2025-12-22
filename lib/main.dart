@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -50,7 +51,7 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-      child: const SubDept(),
+      child: const HomePage(),
     );
   }
 }

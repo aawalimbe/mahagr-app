@@ -76,9 +76,7 @@ class _SubDeptState extends State<SubDept> {
                     return Consumer<ThemeProvider>(
                       builder: (context, themeProvider, _) {
                         return InkWell(
-                          onTap: () {
-                            // TODO: navigation later if needed
-                          },
+                          onTap: () {},
                           child: Container(
                             decoration: BoxDecoration(
                               color:
