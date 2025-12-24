@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'dart:convert';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
@@ -77,25 +78,37 @@ class _HomePageState extends State<HomePage> {
                                   : fullName;
                           return InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => SubSubDepartments(
-                                        subjectId:
-                                            int.tryParse(
-                                              '${department['subject_id']}',
-                                            ) ??
-                                            0,
-                                        departmentNameMar:
-                                            (department['name_mar'] ?? '')
-                                                .toString(),
-                                        departmentNameEng:
-                                            (department['name_eng'] ?? '')
-                                                .toString(),
-                                      ),
-                                ),
-                              );
+                              final subjectId =
+                                  int.tryParse('${department['subject_id']}') ??
+                                  0;
+                              if (subjectId == 14) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SubDept(),
+                                  ),
+                                );
+                              } else {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => SubSubDepartments(
+                                          subjectId:
+                                              int.tryParse(
+                                                '${department['subject_id']}',
+                                              ) ??
+                                              0,
+                                          departmentNameMar:
+                                              (department['name_mar'] ?? '')
+                                                  .toString(),
+                                          departmentNameEng:
+                                              (department['name_eng'] ?? '')
+                                                  .toString(),
+                                        ),
+                                  ),
+                                );
+                              }
                             },
                             child: Consumer<ThemeProvider>(
                               builder: (context, themeProvider, child) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/payment_info.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/welcome_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 
@@ -34,7 +35,7 @@ class StartPage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset(
-                            'assets/images/project_image/logo.png',
+                            'assets/images/original/logo.png',
                             height: 90.h,
                             width: 90.h, // adjust size as needed
                             fit: BoxFit.contain,
@@ -171,7 +172,7 @@ class StartPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const WelcomePage(),
+                          builder: (context) => const PaymentMethodsPage(),
                         ),
                       );
                     },

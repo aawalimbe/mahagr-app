@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'dart:convert';
 
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
@@ -77,7 +78,22 @@ class _SubDeptState extends State<SubDept> {
                       builder: (context, themeProvider, _) {
                         return InkWell(
                           onTap: () {
-                            // TODO: navigation later if needed
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => SubSubDepartments(
+                                      subjectId: 14,
+
+                                      departmentNameMar:
+                                          (subDept['name_mar'] ?? '')
+                                              .toString(),
+                                      departmentNameEng:
+                                          (subDept['name_eng'] ?? '')
+                                              .toString(),
+                                    ),
+                              ),
+                            );
                           },
                           child: Container(
                             decoration: BoxDecoration(
