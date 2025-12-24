@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/payment_info.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   // Initialize API service
@@ -44,6 +41,16 @@ class MyApp extends StatelessWidget {
             return MaterialApp(
               title: 'Forest Department GR and Updates App Demo',
               debugShowCheckedModeBanner: false,
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                    textScaler: const TextScaler.linear(
+                      1.0,
+                    ), // This will stop app font use the device font size.
+                  ),
+                  child: child!,
+                );
+              },
               theme: themeProvider.lightTheme,
               darkTheme: themeProvider.darkTheme,
               themeMode:
