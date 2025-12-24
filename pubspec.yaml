@@ -36,7 +36,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/project_image/
     - assets/images/original/
     - assets/images/original/शासन निर्णय व परिपत्रके1/
     - assets/data/

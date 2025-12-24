@@ -18,11 +18,11 @@
 ],
 
 "subdepartment":[
-  {"id": 1,"name_mar": "सामान्य प्रशासन विभाग","name_eng": "General Administration Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img4.png"},
+  {"id": 1,"name_mar": "सामान्य प्रशासन विभाग","name_eng": "General Administration Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/सामान्य प्रशासन विभाग.png"},
   {"id": 2,"name_mar": "वित्त विभाग","name_eng": "Finance Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वित्त विभाग.jpg"},
   {"id": 3,"name_mar": "महसूल विभाग","name_eng": "Revenue Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img4.png"},
-  {"id": 4,"name_mar": "वन विभाग","name_eng": "Forest Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img5.png"},
-  {"id": 5,"name_mar": "शालेय शिक्षण विभाग","name_eng": "School Education Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img4.png"},
+  {"id": 4,"name_mar": "वन विभाग","name_eng": "Forest Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वन विभाग.png"},
+  {"id": 5,"name_mar": "शालेय शिक्षण विभाग","name_eng": "School Education Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/शालेय शिक्षण विभाग.png"},
   {"id": 6,"name_mar": "कृषी विभाग","name_eng": "Agriculture Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img8.png"},
   {"id": 7,"name_mar": "रोहयो विभाग","name_eng": "Employment Guarantee Scheme Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/रोजगार हमी योजना विभाग.jpg"}
 ]

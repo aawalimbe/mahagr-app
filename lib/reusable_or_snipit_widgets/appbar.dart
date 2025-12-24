@@ -60,7 +60,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               textBaseline: TextBaseline.alphabetic,
               children: [
                 Image.asset(
-                  'assets/images/project_image/logo.png',
+                  //'assets/images/project_image/logo.png',
+                  'assets/images/original/logo.png',
                   width: 50.w,
                   height: 50.h,
                 ),
@@ -111,111 +112,137 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
 
           actions: [
-            IconButton(
-              icon: Icon(
-                Icons.more_vert,
-                size: 32.sp,
-                color:
-                    isDark
-                        ? AppColors.darkTextPrimaryColor
-                        : AppColors.textOnDark,
-              ),
-              padding: EdgeInsets.zero,
-              onPressed: () async {
-                final overlay =
-                    Overlay.of(context).context.findRenderObject() as RenderBox;
+            Padding(
+              padding: EdgeInsets.only(right: 8.w),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8.r),
+                  onTap: () async {
+                    final overlay =
+                        Overlay.of(context).context.findRenderObject()
+                            as RenderBox;
 
-                final selected = await showMenu<String>(
-                  context: context,
-                  position: RelativeRect.fromLTRB(
-                    overlay.size.width - 16.w,
-                    kToolbarHeight + MediaQuery.of(context).padding.top,
-                    16.w,
-                    0,
+                    final selected = await showMenu<String>(
+                      context: context,
+                      position: RelativeRect.fromLTRB(
+                        overlay.size.width - 16.w,
+                        kToolbarHeight + MediaQuery.of(context).padding.top,
+                        16.w,
+                        0,
+                      ),
+                      items: [
+                        PopupMenuItem(
+                          value: 'share_app',
+                          child: ListTile(
+                            leading: Icon(Icons.share, size: 20.sp),
+                            title: Text(
+                              'Share App',
+                              style: AppTextStyles.medium(14.sp),
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'customs_notification',
+                          child: ListTile(
+                            leading: Icon(
+                              Icons.notifications_active,
+                              size: 20.sp,
+                            ),
+                            title: Text(
+                              'Manage Notification',
+                              style: AppTextStyles.medium(14.sp),
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'give_suggestions',
+                          child: ListTile(
+                            leading: Icon(Icons.feedback, size: 20.sp),
+                            title: Text(
+                              'Give Suggestions',
+                              style: AppTextStyles.medium(14.sp),
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'share_documents',
+                          child: ListTile(
+                            leading: Icon(Icons.upload_file, size: 20.sp),
+                            title: Text(
+                              'Upload Documents',
+                              style: AppTextStyles.medium(14.sp),
+                            ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'logout',
+                          child: ListTile(
+                            leading: Icon(Icons.logout_outlined, size: 20.sp),
+                            title: Text(
+                              'Logout',
+                              style: AppTextStyles.medium(14.sp),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+
+                    if (selected == null) return;
+
+                    switch (selected) {
+                      case 'customs_notification':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CustomsNotifictions(),
+                          ),
+                        );
+                        break;
+                      case 'give_suggestions':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const GiveSuggestions(),
+                          ),
+                        );
+                        break;
+                      case 'share_documents':
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ShareDocs()),
+                        );
+                        break;
+                    }
+                  },
+                  child: Container(
+                    width: 30.w,
+                    height: 45.w,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8.r),
+                      border: Border.all(
+                        color:
+                            isDark
+                                ? AppColors.darkTextPrimaryColor
+                                : AppColors.textOnDark,
+                        width: 2,
+                      ),
+                    ),
+                    child: Transform.translate(
+                      offset: const Offset(-2, 0),
+                      child: Icon(
+                        Icons.more_vert,
+                        size: 30.sp,
+                        color:
+                            isDark
+                                ? AppColors.darkTextPrimaryColor
+                                : AppColors.textOnDark,
+                      ),
+                    ),
                   ),
-                  items: [
-                    PopupMenuItem(
-                      value: 'share_app',
-                      child: ListTile(
-                        leading: Icon(Icons.share, size: 20.sp),
-                        title: Text(
-                          'Share App',
-                          style: AppTextStyles.medium(14.sp),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'customs_notification',
-                      child: ListTile(
-                        leading: Icon(Icons.notifications_active, size: 20.sp),
-                        title: Text(
-                          'Manage Notification',
-                          style: AppTextStyles.medium(14.sp),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'give_suggestions',
-                      child: ListTile(
-                        leading: Icon(Icons.feedback, size: 20.sp),
-                        title: Text(
-                          'Give Suggestions',
-                          style: AppTextStyles.medium(14.sp),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'share_documents',
-                      child: ListTile(
-                        leading: Icon(Icons.upload_file, size: 20.sp),
-                        title: Text(
-                          'Upload Documents',
-                          style: AppTextStyles.medium(14.sp),
-                        ),
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: 'Log_out',
-                      child: ListTile(
-                        leading: Icon(Icons.logout_outlined, size: 20.sp),
-                        title: Text(
-                          'LogOut',
-                          style: AppTextStyles.medium(14.sp),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-
-                if (selected == null) return;
-
-                switch (selected) {
-                  case 'share_app':
-                    break;
-                  case 'customs_notification':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CustomsNotifictions(),
-                      ),
-                    );
-                    break;
-                  case 'give_suggestions':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const GiveSuggestions(),
-                      ),
-                    );
-                    break;
-                  case 'share_documents':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ShareDocs()),
-                    );
-                    break;
-                }
-              },
+                ),
+              ),
             ),
           ],
 

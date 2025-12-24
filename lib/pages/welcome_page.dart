@@ -26,7 +26,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 width: double.infinity,
                 height: 500.h,
                 child: Image.asset(
-                  "assets/images/project_image/grid.jpg",
+                  "assets/images/original/grid.jpeg",
                   fit: BoxFit.contain,
                 ),
               ),
@@ -141,7 +141,7 @@ class _WelcomePageState extends State<WelcomePage> {
                   alignment: Alignment.center,
                   child: ClipOval(
                     child: Image.asset(
-                      'assets/images/project_image/logo.png',
+                      'assets/images/original/logo.png',
                       width: 100.sp,
                       height: 100.sp,
                       fit: BoxFit.cover,
