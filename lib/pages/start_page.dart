@@ -9,10 +9,10 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Scaffold(
-        backgroundColor: AppColors.textOnLight,
-        body: Center(
+    return Scaffold(
+      backgroundColor: AppColors.textOnLight,
+      body: SingleChildScrollView(
+        child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
             child: Container(
