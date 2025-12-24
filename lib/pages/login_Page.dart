@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
@@ -21,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   final _otpController = TextEditingController();
 
   bool _isLoading = false;
-  final bool _obscureOTP = false;
+  bool _isOtpSend = false;
 
   @override
   void dispose() {
@@ -30,49 +31,30 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  Future<void> _login() async {
+  void _onButtonPressed() {
     if (!_formKey.currentState!.validate()) return;
+
+    if (!_isOtpSend) {
+      setState(() {
+        _isOtpSend = true;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP sent to your mobile number')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
-    try {
-      print("=== LOGIN ATTEMPT ===");
-      print("Mobile: ${_mobileController.text.trim()}");
-      print("OTP: ${_otpController.text.trim()}");
-      print("API Base URL: ${ApiConfig.baseUrl}");
-      print("=====================");
-
-      // Temporarily pass mobile as email and otp as password
-      final response = await ApiService.loginUser(
-        email: _mobileController.text.trim(),
-        password: _otpController.text.trim(),
-      );
-
-      final status = response["status"];
-      final message = (response["message"] ?? "").toString();
-
-      final isSuccess =
-          status == true || status?.toString().toLowerCase() == "true";
-
-      if (isSuccess) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
-      } else {
-        _showError(message.isNotEmpty ? message : "Login failed.");
-      }
-    } catch (e) {
-      _showError("Network error: $e");
-    } finally {
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() => _isLoading = false);
-    }
-  }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    });
   }
 
   @override
@@ -102,6 +84,10 @@ class _LoginPageState extends State<LoginPage> {
                         controller: _mobileController,
                         keyboardType: TextInputType.phone,
                         style: AppTextStyles.regular(16.sp),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(10),
+                        ],
                         decoration: InputDecoration(
                           labelText: 'Mobile Number',
                           enabledBorder: OutlineInputBorder(
@@ -123,10 +109,8 @@ class _LoginPageState extends State<LoginPage> {
                             return "Enter mobile number";
                           }
 
-                          final v = value.trim();
-
                           // Must be exactly 10 digits
-                          if (!RegExp(r'^[0-9]{10}$').hasMatch(v)) {
+                          if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
                             return "Enter valid 10-digit mobile number";
                           }
 
@@ -135,45 +119,48 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
 
-                    SizedBox(height: 20.h),
-
                     // OTP FIELD
-                    SizedBox(
-                      height: 80.h,
-                      child: TextFormField(
-                        controller: _otpController,
-                        keyboardType: TextInputType.number,
-                        obscureText: false,
-                        maxLength: 6,
-                        style: AppTextStyles.regular(16.sp),
-                        decoration: InputDecoration(
-                          counterText: "",
-                          labelText: 'OTP (6 digits)',
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: AppColors.primaryColor,
+                    if (_isOtpSend) ...[
+                      SizedBox(height: 20.h),
+
+                      SizedBox(
+                        height: 80.h,
+                        child: TextFormField(
+                          controller: _otpController,
+                          keyboardType: TextInputType.number,
+                          obscureText: false,
+                          maxLength: 6,
+                          style: AppTextStyles.regular(16.sp),
+                          decoration: InputDecoration(
+                            counterText: "",
+                            labelText: 'OTP (6 digits)',
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                              borderSide: BorderSide(
+                                color: AppColors.primaryColor,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                              borderSide: BorderSide(
+                                color: AppColors.dprimaryColor,
+                                width: 2,
+                              ),
                             ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(
-                              color: AppColors.dprimaryColor,
-                              width: 2,
-                            ),
-                          ),
+                          validator: (value) {
+                            if (!_isOtpSend) return null;
+                            if (value == null || value.isEmpty) {
+                              return "Enter OTP";
+                            }
+                            if (!RegExp(r'^[0-9]{6}$').hasMatch(value)) {
+                              return "Enter valid 6-digit OTP";
+                            }
+                            return null;
+                          },
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter OTP";
-                          }
-                          if (!RegExp(r'^[0-9]{6}$').hasMatch(value)) {
-                            return "Enter valid 6-digit OTP";
-                          }
-                          return null;
-                        },
                       ),
-                    ),
+                    ],
 
                     SizedBox(height: 40.h),
 
@@ -182,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                       width: 250.w,
                       height: 50.h,
                       child: ElevatedButton(
-                        onPressed: _login,
+                        onPressed: _isLoading ? null : _onButtonPressed,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryColor,
                           foregroundColor: AppColors.textOnDark,
@@ -196,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                                   color: AppColors.textOnDark,
                                 )
                                 : Text(
-                                  'Generate OTP',
+                                  _isOtpSend ? 'Login' : 'Generate OTP',
                                   style: AppTextStyles.medium(16.sp),
                                 ),
                       ),
