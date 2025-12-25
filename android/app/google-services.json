@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431952176498",
+    "project_id": "maha-gr",
+    "storage_bucket": "maha-gr.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431952176498:android:1bee845e4ed95033a5a9eb",
+        "android_client_info": {
+          "package_name": "com.example.forrest_department_gr_and_updatees_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyIbymGpbKBVWSjCRlDChViX0FSZ3H_0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

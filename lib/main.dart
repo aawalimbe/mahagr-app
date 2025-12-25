@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
@@ -8,6 +9,9 @@ import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  // Initialize Firebase
+  Firebase.initializeApp();
+
   // Initialize API service
   ApiService.initialize();
 
