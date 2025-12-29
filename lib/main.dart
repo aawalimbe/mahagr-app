@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
@@ -8,15 +11,18 @@ import 'package:forrest_department_gr_and_updatees_app/splash_screen.dart';
 import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+  //initializes Flutter’s engine and platform bindings before
+  WidgetsFlutterBinding.ensureInitialized();
+
   // Initialize Firebase
-  Firebase.initializeApp();
+  await Firebase.initializeApp();
 
   // Initialize API service
   ApiService.initialize();
 
   // Test online connection
-  testOnlineConnection();
+  await testOnlineConnection();
 
   runApp(
     MultiProvider(
