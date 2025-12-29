@@ -1,12 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +24,8 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   bool _isOtpSend = false;
 
+  int _generatedOtp = 0;
+
   @override
   void dispose() {
     _mobileController.dispose();
@@ -31,20 +33,49 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  // Generate random 6-digit OTP
+  int _generateOtp() {
+    return 100000 + DateTime.now().millisecondsSinceEpoch % 900000;
+  }
+
+  // Auto-fill OTP with animation
+  Future<void> _autoFillOtp(int otp) async {
+    String otpStr = otp.toString();
+    _otpController.clear();
+
+    for (int i = 0; i < otpStr.length; i++) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      _otpController.text += otpStr[i];
+    }
+
+    await Future.delayed(const Duration(milliseconds: 400));
+    _onButtonPressed(); // Auto login
+  }
+
   void _onButtonPressed() {
     if (!_formKey.currentState!.validate()) return;
 
+    // Generate OTP
     if (!_isOtpSend) {
+      _generatedOtp = _generateOtp();
+
       setState(() {
         _isOtpSend = true;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP sent to your mobile number')),
+        SnackBar(content: Text('OTP $_generatedOtp auto detected')),
       );
+
+      // Simulate SMS auto-read
+      Future.delayed(const Duration(milliseconds: 800), () {
+        _autoFillOtp(_generatedOtp);
+      });
+
       return;
     }
 
+    // Login process
     setState(() => _isLoading = true);
 
     Future.delayed(const Duration(seconds: 1), () {
@@ -52,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (_) => const HomePage()),
       );
     });
   }
@@ -77,7 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20.h),
 
-                    // MOBILE NUMBER FIELD
+                    /// MOBILE NUMBER FIELD
                     SizedBox(
                       height: 80.h,
                       child: TextFormField(
@@ -108,27 +139,22 @@ class _LoginPageState extends State<LoginPage> {
                           if (value == null || value.trim().isEmpty) {
                             return "Enter mobile number";
                           }
-
-                          // Must be exactly 10 digits
                           if (!RegExp(r'^[0-9]{10}$').hasMatch(value.trim())) {
                             return "Enter valid 10-digit mobile number";
                           }
-
                           return null;
                         },
                       ),
                     ),
 
-                    // OTP FIELD
+                    /// OTP FIELD
                     if (_isOtpSend) ...[
                       SizedBox(height: 20.h),
-
                       SizedBox(
                         height: 80.h,
                         child: TextFormField(
                           controller: _otpController,
                           keyboardType: TextInputType.number,
-                          obscureText: false,
                           maxLength: 6,
                           style: AppTextStyles.regular(16.sp),
                           decoration: InputDecoration(
@@ -164,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     SizedBox(height: 40.h),
 
-                    // LOGIN BUTTON
+                    /// LOGIN BUTTON
                     SizedBox(
                       width: 250.w,
                       height: 50.h,
@@ -191,7 +217,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     SizedBox(height: 40.h),
 
-                    // REGISTRATION
+                    /// REGISTRATION
                     InkWell(
                       onTap: () {
                         Navigator.push(
