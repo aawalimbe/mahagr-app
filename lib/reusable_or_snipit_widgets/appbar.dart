@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/customs_notifictions.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/give_sugg.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/share_doc.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
@@ -124,7 +126,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                       width: 2,
                     ),
                   ),
-                  child: const Icon(Icons.more_vert, size: 30),
+                  child: Transform.translate(
+                    offset: const Offset(-1.7, 0),
+                    child: const Icon(Icons.more_vert, size: 30),
+                  ),
                 ),
                 onSelected: (value) {
                   switch (value) {
@@ -149,6 +154,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         context,
                         MaterialPageRoute(builder: (_) => const ShareDocs()),
                       );
+                      break;
+                    case 'logout':
+                      logout(context);
                       break;
                   }
                 },
@@ -231,4 +239,15 @@ class _MenuLine extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> logout(BuildContext context) async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const LoginPage()),
+    (route) => false,
+  );
 }

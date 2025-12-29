@@ -154,8 +154,8 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Image.asset(
                                             department['logo'],
-                                            width: isWide ? 55 : 60,
-                                            height: isWide ? 55 : 60,
+                                            width: isWide ? 55 : 65,
+                                            height: isWide ? 55 : 65,
                                             fit: BoxFit.contain,
                                           ),
                                           const SizedBox(height: 6),
@@ -166,8 +166,8 @@ class _HomePageState extends State<HomePage> {
                                             overflow: TextOverflow.ellipsis,
                                             style: AppTextStyles.regular(
                                               lang == 'mar'
-                                                  ? (isWide ? 13 : 14)
-                                                  : (isWide ? 11 : 12),
+                                                  ? (isWide ? 13 : 15)
+                                                  : (isWide ? 11 : 13),
                                             ).copyWith(
                                               color:
                                                   themeProvider.isDarkMode
