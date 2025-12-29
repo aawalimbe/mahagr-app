@@ -1,10 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
+import 'package:forrest_department_gr_and_updatees_app/splash_screen.dart';
 import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
 import 'package:provider/provider.dart';
 
@@ -64,7 +64,7 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-      child: const StartPage(),
+      child: const SplashScreen(),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/registration.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -33,12 +34,12 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Generate random 6-digit OTP
+  /// Generate random 6-digit OTP
   int _generateOtp() {
     return 100000 + DateTime.now().millisecondsSinceEpoch % 900000;
   }
 
-  // Auto-fill OTP with animation
+  /// Auto-fill OTP with animation
   Future<void> _autoFillOtp(int otp) async {
     String otpStr = otp.toString();
     _otpController.clear();
@@ -52,10 +53,16 @@ class _LoginPageState extends State<LoginPage> {
     _onButtonPressed(); // Auto login
   }
 
+  /// Save login state
+  Future<void> _saveLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
+  }
+
   void _onButtonPressed() {
     if (!_formKey.currentState!.validate()) return;
 
-    // Generate OTP
+    /// Generate OTP
     if (!_isOtpSend) {
       _generatedOtp = _generateOtp();
 
@@ -67,7 +74,6 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(content: Text('OTP $_generatedOtp auto detected')),
       );
 
-      // Simulate SMS auto-read
       Future.delayed(const Duration(milliseconds: 800), () {
         _autoFillOtp(_generatedOtp);
       });
@@ -75,11 +81,14 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Login process
+    /// Login process
     setState(() => _isLoading = true);
 
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 1), () async {
       setState(() => _isLoading = false);
+
+      /// Save login flag
+      await _saveLoginStatus();
 
       Navigator.pushReplacement(
         context,
@@ -108,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20.h),
 
-                    /// MOBILE NUMBER FIELD
+                    /// MOBILE NUMBER
                     SizedBox(
                       height: 80.h,
                       child: TextFormField(
@@ -190,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
 
                     SizedBox(height: 40.h),
 
-                    /// LOGIN BUTTON
+                    /// BUTTON
                     SizedBox(
                       width: 250.w,
                       height: 50.h,

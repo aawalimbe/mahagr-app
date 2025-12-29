@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
-import 'package:forrest_department_gr_and_updatees_app/splash_screen.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
+
+import 'login_Page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -113,7 +114,7 @@ class _WelcomePageState extends State<WelcomePage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const SplashScreen(),
+                                  builder: (context) => const LoginPage(),
                                 ),
                               );
                             },
