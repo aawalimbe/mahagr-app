@@ -1,10 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/start_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/pages/welcome_page.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
@@ -17,8 +14,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
-  await Firebase.initializeApp();
-
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+  }
   // Initialize API service
   ApiService.initialize();
 
@@ -71,7 +69,7 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-      child: const HomePage(),
+      child: const SplashScreen(),
     );
   }
 }

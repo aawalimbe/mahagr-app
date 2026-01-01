@@ -42,15 +42,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.white, width: 2),
                       ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          _MenuLine(),
-                          SizedBox(height: 4),
-                          _MenuLine(),
-                          SizedBox(height: 4),
-                          _MenuLine(),
-                        ],
+                      child: const Center(
+                        child: Icon(
+                          Icons.menu, // drawer 3-line icon
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
@@ -219,24 +216,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _MenuLine extends StatelessWidget {
-  const _MenuLine();
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 20,
-      height: 2.5,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(2),
-        ),
       ),
     );
   }

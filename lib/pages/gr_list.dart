@@ -1,11 +1,12 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_config.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:http/http.dart' as http;
+
 import '../reusable_or_snipit_widgets/api_list.dart';
 import 'img_viewer.dart';
 import 'pdf_viewer.dart';
@@ -35,6 +36,7 @@ class GrList extends StatefulWidget {
 class _GrListState extends State<GrList> {
   List document = [];
   bool loading = true;
+  int srCounter = 1;
 
   late String subCategoryName;
 
@@ -73,6 +75,10 @@ class _GrListState extends State<GrList> {
   }
 
   bool isPdf(String link) => link.toLowerCase().contains(".pdf");
+  bool isBlankRow(Map d) {
+    return (d["gr_name"] == null || d["gr_name"].toString().trim().isEmpty) &&
+        (d["date"] == null || d["date"].toString().trim().isEmpty);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,65 +152,104 @@ class _GrListState extends State<GrList> {
                                     final d = document[i];
                                     final link = d["gr_link"] ?? "";
 
+                                    final bool isBlankRow =
+                                        (d["gr_name"] == null ||
+                                            d["gr_name"]
+                                                .toString()
+                                                .trim()
+                                                .isEmpty) &&
+                                        (d["date"] == null ||
+                                            d["date"]
+                                                .toString()
+                                                .trim()
+                                                .isEmpty);
+
+                                    /// 🔴 RESET COUNTER HERE
+                                    if (isBlankRow) {
+                                      srCounter = 1;
+                                    }
+
+                                    final String srText =
+                                        isBlankRow ? "" : srCounter.toString();
+                                    if (!isBlankRow) srCounter++;
+
                                     return TableRow(
+                                      decoration: BoxDecoration(
+                                        color:
+                                            isBlankRow
+                                                ? Colors.green.withOpacity(0.12)
+                                                : Colors.transparent,
+                                      ),
                                       children: [
-                                        cell("${i + 1}"),
+                                        cell(srText),
                                         cell(d["gr_name"] ?? ""),
                                         cell(d["date"] ?? ""),
-
                                         Padding(
                                           padding: EdgeInsets.all(4.r),
                                           child: IconButton(
                                             icon: Icon(
                                               isPdf(link)
                                                   ? Icons.picture_as_pdf
-                                                  : Icons.image,
+                                                  : null,
                                               color:
                                                   isPdf(link)
                                                       ? AppColors.compulsory
                                                       : AppColors.vibrantgreen,
                                             ),
-                                            onPressed: () {
-                                              final pdfUrl =
-                                                  (d["file_upload_location"]
-                                                              ?.toString()
-                                                              .trim()
-                                                              .isNotEmpty ==
-                                                          true)
-                                                      ? ApiConfig.baseUrl
-                                                              .replaceAll(
-                                                                '/api/',
-                                                                '/',
-                                                              ) +
-                                                          d["file_upload_location"]
-                                                      : d["gr_link"];
+                                            onPressed:
+                                                isBlankRow
+                                                    ? null
+                                                    : () {
+                                                      final pdfUrl =
+                                                          (d["file_upload_location"]
+                                                                      ?.toString()
+                                                                      .trim()
+                                                                      .isNotEmpty ==
+                                                                  true)
+                                                              ? ApiConfig
+                                                                      .baseUrl
+                                                                      .replaceAll(
+                                                                        '/api/',
+                                                                        '/',
+                                                                      ) +
+                                                                  d["file_upload_location"]
+                                                              : d["gr_link"];
 
-                                              final title = d["gr_name"] ?? "";
+                                                      final title =
+                                                          d["gr_name"] ?? "";
 
-                                              if (isPdf(pdfUrl)) {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (_) => PdfViewer(
-                                                          pdfUrl: pdfUrl,
-                                                          documentTitle: title,
-                                                        ),
-                                                  ),
-                                                );
-                                              } else {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (_) => ImageViewer(
-                                                          imageUrl: pdfUrl,
-                                                          documentTitle: title,
-                                                        ),
-                                                  ),
-                                                );
-                                              }
-                                            },
+                                                      if (isPdf(pdfUrl)) {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  _,
+                                                                ) => PdfViewer(
+                                                                  pdfUrl:
+                                                                      pdfUrl,
+                                                                  documentTitle:
+                                                                      title,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder:
+                                                                (
+                                                                  _,
+                                                                ) => ImageViewer(
+                                                                  imageUrl:
+                                                                      pdfUrl,
+                                                                  documentTitle:
+                                                                      title,
+                                                                ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
                                           ),
                                         ),
                                       ],
