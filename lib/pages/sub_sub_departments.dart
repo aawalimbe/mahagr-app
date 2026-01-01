@@ -396,6 +396,8 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
                   categoryId: catId,
                   subCategoryId: 0,
                   subCategoryName: name,
+                  departmentNameMar: widget.departmentNameMar,
+                  departmentNameEng: widget.departmentNameEng,
                 ),
           ),
         );
@@ -429,6 +431,8 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
                             categoryId: catId,
                             subCategoryId: scId,
                             subCategoryName: scName,
+                            departmentNameMar: widget.departmentNameMar,
+                            departmentNameEng: widget.departmentNameEng,
                           ),
                     ),
                   );

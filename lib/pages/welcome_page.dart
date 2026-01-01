@@ -98,6 +98,7 @@ class WelcomePage extends StatelessWidget {
                                 padding: EdgeInsets.symmetric(vertical: 14.h),
                                 backgroundColor: Colors.transparent,
                                 shadowColor: Colors.transparent,
+                                foregroundColor: AppColors.textOnDark,
                                 elevation: 0,
                               ),
                               onPressed: () {
@@ -110,7 +111,7 @@ class WelcomePage extends StatelessWidget {
                               },
                               child: Text(
                                 "Get started",
-                                style: AppTextStyles.bold(18.sp),
+                                style: AppTextStyles.bold(22.sp),
                               ),
                             ),
                           ),

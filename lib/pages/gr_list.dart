@@ -15,6 +15,8 @@ class GrList extends StatefulWidget {
   final int categoryId;
   final int subCategoryId;
   final String subCategoryName;
+  final String departmentNameMar;
+  final String departmentNameEng;
 
   const GrList({
     super.key,
@@ -22,6 +24,8 @@ class GrList extends StatefulWidget {
     required this.categoryId,
     required this.subCategoryId,
     required this.subCategoryName,
+    required this.departmentNameMar,
+    required this.departmentNameEng,
   });
 
   @override
@@ -73,7 +77,14 @@ class _GrListState extends State<GrList> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: CustomScaffold(
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            widget.departmentNameMar,
+            style: AppTextStyles.bold(20.sp),
+          ),
+        ),
         body: Padding(
           padding: EdgeInsets.all(16.r),
           child: Column(
@@ -82,7 +93,7 @@ class _GrListState extends State<GrList> {
               Center(
                 child: Text(subCategoryName, style: AppTextStyles.bold(15.sp)),
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 10.h),
 
               Expanded(
                 child:
@@ -160,7 +171,11 @@ class _GrListState extends State<GrList> {
                                                               .trim()
                                                               .isNotEmpty ==
                                                           true)
-                                                      ? ApiConfig.baseUrl.replaceAll('/api/', '/') +
+                                                      ? ApiConfig.baseUrl
+                                                              .replaceAll(
+                                                                '/api/',
+                                                                '/',
+                                                              ) +
                                                           d["file_upload_location"]
                                                       : d["gr_link"];
 

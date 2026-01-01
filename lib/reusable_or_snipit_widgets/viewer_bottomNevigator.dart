@@ -47,7 +47,10 @@ class ViewerBottomNavigator extends StatelessWidget {
             child: const _NavItem(icon: Icons.save_alt, label: 'Save'),
           ),
           GestureDetector(
-            onTap: onRotate,
+            onTap: () {
+              onRotate();
+            },
+            behavior: HitTestBehavior.opaque,
             child: const _NavItem(icon: Icons.screen_rotation, label: 'Rotate'),
           ),
           GestureDetector(

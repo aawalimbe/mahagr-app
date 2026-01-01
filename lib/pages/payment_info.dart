@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/welcome_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 
 class PaymentMethodsPage extends StatelessWidget {
@@ -55,7 +56,7 @@ class PaymentMethodsPage extends StatelessWidget {
       children: [
         // HEADER
         TableRow(
-          decoration: const BoxDecoration(color: Color(0xFFF5F5F5)),
+          decoration: BoxDecoration(color: AppColors.backgroundColor),
           children: [
             _cell('FEATURE', isHeader: true),
             _cell('AMOUNT / VALUE', isHeader: true),
@@ -104,6 +105,11 @@ class PaymentMethodsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          title: Center(
+            child: Text("Payment Details", style: AppTextStyles.bold(20.sp)),
+          ),
+        ),
         backgroundColor: AppColors.backgroundColor,
 
         body: Center(
@@ -128,7 +134,7 @@ class PaymentMethodsPage extends StatelessWidget {
 
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppColors.celadon,
+                  color: AppColors.primaryColor,
                   // gradient: LinearGradient(
                   //   colors: [Color(0xFF2D6AFF), Color(0xFFED4E7E)],
                   // ),
@@ -149,11 +155,11 @@ class PaymentMethodsPage extends StatelessWidget {
                     );
                   },
                   child: Text(
-                    '₹1 Start Trial',
+                    '₹1 START TRIAL',
                     style: TextStyle(
-                      fontSize: 14.sp,
+                      fontSize: 20.sp,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: AppColors.textOnDark,
                     ),
                   ),
                 ),

@@ -70,7 +70,7 @@ class HamburgerMenu extends StatelessWidget {
                     Column(
                       children: [
                         Image.asset(
-                          'assets/images/project_image/logo.png',
+                          'assets/images/original/logo.png',
                           width: 90,
                           height: 90,
                           fit: BoxFit.contain,

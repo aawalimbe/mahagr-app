@@ -30,6 +30,7 @@ class _PdfViewerState extends State<PdfViewer> {
 
   bool _isPortrait = true;
   bool _isDownloading = false;
+  bool _isRotating = false;
 
   @override
   void initState() {
@@ -96,19 +97,34 @@ class _PdfViewerState extends State<PdfViewer> {
   }
 
   void _rotate() async {
-    if (_isPortrait) {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.landscapeLeft,
-        DeviceOrientation.landscapeRight,
-      ]);
-    } else {
-      await SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
-    }
+    if (_isRotating) return;
+    
+    setState(() => _isRotating = true);
+    
+    try {
+      if (_isPortrait) {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.landscapeLeft,
+          DeviceOrientation.landscapeRight,
+        ]);
+      } else {
+        await SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
 
-    setState(() => _isPortrait = !_isPortrait);
+      if (mounted) {
+        setState(() {
+          _isPortrait = !_isPortrait;
+          _isRotating = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isRotating = false);
+      }
+    }
   }
 
   @override
@@ -123,31 +139,34 @@ class _PdfViewerState extends State<PdfViewer> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: CustomScaffold(
-        body:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(_error!, style: const TextStyle(color: Colors.red)),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: _loadPDF,
-                        child: const Text("Retry"),
-                      ),
-                    ],
-                  ),
-                )
-                : PdfViewPinch(controller: _pdfController!),
+    return PopScope(
+      canPop: !_isRotating,
+      child: SafeArea(
+        child: CustomScaffold(
+          body:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _error != null
+                  ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(_error!, style: const TextStyle(color: Colors.red)),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: _loadPDF,
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  )
+                  : PdfViewPinch(controller: _pdfController!),
 
-        bottomNavigationBar: ViewerBottomNavigator(
-          onShare: _share,
-          onDownload: _isDownloading ? () {} : _download,
-          onRotate: _rotate,
+          bottomNavigationBar: ViewerBottomNavigator(
+            onShare: _share,
+            onDownload: _isDownloading ? () {} : _download,
+            onRotate: _rotate,
+          ),
         ),
       ),
     );

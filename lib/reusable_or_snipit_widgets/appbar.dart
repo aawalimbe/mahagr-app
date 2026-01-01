@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/customs_notifictions.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/give_sugg.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/login_Page.dart';
@@ -35,8 +36,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   child: GestureDetector(
                     onTap: () => Scaffold.of(context).openDrawer(),
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 35,
+                      height: 35,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.white, width: 2),
@@ -45,9 +46,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: const [
                           _MenuLine(),
-                          SizedBox(height: 5),
+                          SizedBox(height: 4),
                           _MenuLine(),
-                          SizedBox(height: 5),
+                          SizedBox(height: 4),
                           _MenuLine(),
                         ],
                       ),
@@ -110,11 +111,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
           actions: [
             Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: EdgeInsets.only(right: 8),
               child: PopupMenuButton<String>(
                 icon: Container(
-                  width: 30,
-                  height: 45,
+                  width: 25.w,
+                  height: 40.h,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
@@ -127,7 +128,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     ),
                   ),
                   child: Transform.translate(
-                    offset: const Offset(-1.7, 0),
+                    offset: const Offset(-4, 0),
                     child: const Icon(Icons.more_vert, size: 30),
                   ),
                 ),
@@ -229,8 +230,8 @@ class _MenuLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 30,
-      height: 3,
+      width: 20,
+      height: 2.5,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: Colors.white,

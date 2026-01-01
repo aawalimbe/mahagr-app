@@ -47,109 +47,119 @@ class _SubDeptState extends State<SubDept> {
     final lang = Provider.of<LanguageProvider>(context).language;
 
     return SafeArea(
-      child: CustomScaffold(
-        body:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : GridView.builder(
-                  padding: EdgeInsets.all(14.sp),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 13,
-                    mainAxisSpacing: 13,
-                    childAspectRatio: 0.74,
-                  ),
-                  itemCount: _subDepartments.length,
-                  itemBuilder: (context, index) {
-                    final subDept = _subDepartments[index];
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'शासन निर्णय व परिपत्रके',
+            style: AppTextStyles.bold(22.sp),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 10.0),
+          child:
+              _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : GridView.builder(
+                    padding: EdgeInsets.all(14.sp),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 13,
+                          mainAxisSpacing: 13,
+                          childAspectRatio: 0.74,
+                        ),
+                    itemCount: _subDepartments.length,
+                    itemBuilder: (context, index) {
+                      final subDept = _subDepartments[index];
 
-                    final fullName =
-                        lang == 'mar'
-                            ? (subDept['name_mar'] ?? '')
-                            : (subDept['name_eng'] ?? '');
+                      final fullName =
+                          lang == 'mar'
+                              ? (subDept['name_mar'] ?? '')
+                              : (subDept['name_eng'] ?? '');
 
-                    final words = fullName.split(' ');
-                    final name =
-                        words.length > 1
-                            ? '${words.sublist(0, words.length - 1).join(' ')}\n${words.last}'
-                            : fullName;
+                      final words = fullName.split(' ');
+                      final name =
+                          words.length > 1
+                              ? '${words.sublist(0, words.length - 1).join(' ')}\n${words.last}'
+                              : fullName;
 
-                    return Consumer<ThemeProvider>(
-                      builder: (context, themeProvider, _) {
-                        return InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder:
-                                    (context) => SubSubDepartments(
-                                      subjectId: 14,
+                      return Consumer<ThemeProvider>(
+                        builder: (context, themeProvider, _) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => SubSubDepartments(
+                                        subjectId: 14,
 
-                                      departmentNameMar:
-                                          (subDept['name_mar'] ?? '')
-                                              .toString(),
-                                      departmentNameEng:
-                                          (subDept['name_eng'] ?? '')
-                                              .toString(),
-                                    ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color:
-                                  themeProvider.isDarkMode
-                                      ? AppColors.darkCardColor
-                                      : Colors.white,
-                              borderRadius: BorderRadius.circular(25.r),
-                              border: Border.all(
+                                        departmentNameMar:
+                                            (subDept['name_mar'] ?? '')
+                                                .toString(),
+                                        departmentNameEng:
+                                            (subDept['name_eng'] ?? '')
+                                                .toString(),
+                                      ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
                                 color:
                                     themeProvider.isDarkMode
-                                        ? AppColors.darkPrimaryColor
-                                        : AppColors.primaryColor,
-                                width: 2.5.w,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
+                                        ? AppColors.darkCardColor
+                                        : Colors.white,
+                                borderRadius: BorderRadius.circular(25.r),
+                                border: Border.all(
                                   color:
                                       themeProvider.isDarkMode
-                                          ? Colors.black.withOpacity(0.3)
-                                          : AppColors.border,
-                                  blurRadius: 6,
-                                  offset: const Offset(4, 4),
+                                          ? AppColors.darkPrimaryColor
+                                          : AppColors.primaryColor,
+                                  width: 2.5.w,
                                 ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  subDept['logo'],
-                                  width: 60.w,
-                                  height: 60.w,
-                                  fit: BoxFit.contain,
-                                ),
-                                SizedBox(height: 6.h),
-                                Text(
-                                  name,
-                                  textAlign: TextAlign.center,
-                                  style: AppTextStyles.regular(
-                                    lang == 'mar' ? 14.sp : 12.sp,
-                                  ).copyWith(
+                                boxShadow: [
+                                  BoxShadow(
                                     color:
                                         themeProvider.isDarkMode
-                                            ? AppColors.darkTextPrimaryColor
-                                            : AppColors.textOnLight,
+                                            ? Colors.black.withOpacity(0.3)
+                                            : AppColors.border,
+                                    blurRadius: 6,
+                                    offset: const Offset(4, 4),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    subDept['logo'],
+                                    width: 60.w,
+                                    height: 60.w,
+                                    fit: BoxFit.contain,
+                                  ),
+                                  SizedBox(height: 6.h),
+                                  Text(
+                                    name,
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.regular(
+                                      lang == 'mar' ? 14.sp : 12.sp,
+                                    ).copyWith(
+                                      color:
+                                          themeProvider.isDarkMode
+                                              ? AppColors.darkTextPrimaryColor
+                                              : AppColors.textOnLight,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
+                          );
+                        },
+                      );
+                    },
+                  ),
+        ),
       ),
     );
   }
