@@ -226,8 +226,8 @@ class _GrListState extends State<GrList> {
                                                                 (
                                                                   _,
                                                                 ) => PdfViewer(
-                                                                  pdfUrl:
-                                                                      pdfUrl,
+                                                                  // pdfUrl:
+                                                                  //     pdfUrl,
                                                                   documentTitle:
                                                                       title,
                                                                 ),
