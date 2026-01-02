@@ -229,20 +229,13 @@ class _GrListState extends State<GrList> {
                                                                   .vibrantgreen,
                                                     ),
                                                     onPressed: () {
-                                                      final pdfUrl =
-                                                          (d["file_upload_location"]
-                                                                      ?.toString()
-                                                                      .trim()
-                                                                      .isNotEmpty ==
-                                                                  true)
-                                                              ? ApiConfig
-                                                                      .baseUrl
-                                                                      .replaceAll(
-                                                                        '/api/',
-                                                                        '/',
-                                                                      ) +
-                                                                  d["file_upload_location"]
-                                                              : d["gr_link"];
+                                                      // Get file URL - check if it's already a full URL
+                                                      final fileLocation = d["file_upload_location"]?.toString().trim() ?? '';
+                                                      final pdfUrl = (fileLocation.isNotEmpty)
+                                                          ? (fileLocation.startsWith('http://') || fileLocation.startsWith('https://'))
+                                                              ? fileLocation // Already a full URL, use as-is
+                                                              : ApiConfig.baseUrl.replaceAll('/api/', '/') + fileLocation // Construct URL
+                                                          : d["gr_link"] ?? '';
 
                                                       final title =
                                                           d["gr_name"] ?? "";
