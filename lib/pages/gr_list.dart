@@ -152,7 +152,7 @@ class _GrListState extends State<GrList> {
                                     final d = document[i];
                                     final link = d["gr_link"] ?? "";
 
-                                    final bool isBlankRow =
+                                    final bool isCompletelyBlank =
                                         (d["gr_name"] == null ||
                                             d["gr_name"]
                                                 .toString()
@@ -162,44 +162,73 @@ class _GrListState extends State<GrList> {
                                             d["date"]
                                                 .toString()
                                                 .trim()
+                                                .isEmpty) &&
+                                        (d["gr_link"] == null ||
+                                            d["gr_link"]
+                                                .toString()
+                                                .trim()
+                                                .isEmpty) &&
+                                        (d["file_upload_location"] == null ||
+                                            d["file_upload_location"]
+                                                .toString()
+                                                .trim()
                                                 .isEmpty);
 
-                                    /// 🔴 RESET COUNTER HERE
-                                    if (isBlankRow) {
+                                    /// RESET COUNTER ONLY FOR FULLY BLANK ROW
+                                    if (isCompletelyBlank) {
                                       srCounter = 1;
                                     }
 
                                     final String srText =
-                                        isBlankRow ? "" : srCounter.toString();
-                                    if (!isBlankRow) srCounter++;
+                                        isCompletelyBlank
+                                            ? ""
+                                            : srCounter.toString();
+                                    if (!isCompletelyBlank) srCounter++;
 
                                     return TableRow(
                                       decoration: BoxDecoration(
                                         color:
-                                            isBlankRow
+                                            isCompletelyBlank
                                                 ? Colors.green.withOpacity(0.12)
                                                 : Colors.transparent,
                                       ),
                                       children: [
                                         cell(srText),
+
                                         cell(d["gr_name"] ?? ""),
-                                        cell(d["date"] ?? ""),
+
+                                        Center(
+                                          child: cell(
+                                            isCompletelyBlank
+                                                ? ""
+                                                : (d["date"] == null ||
+                                                    d["date"]
+                                                        .toString()
+                                                        .trim()
+                                                        .isEmpty)
+                                                ? "_"
+                                                : d["date"].toString(),
+                                          ),
+                                        ),
+
                                         Padding(
                                           padding: EdgeInsets.all(4.r),
-                                          child: IconButton(
-                                            icon: Icon(
-                                              isPdf(link)
-                                                  ? Icons.picture_as_pdf
-                                                  : null,
-                                              color:
-                                                  isPdf(link)
-                                                      ? AppColors.compulsory
-                                                      : AppColors.vibrantgreen,
-                                            ),
-                                            onPressed:
-                                                isBlankRow
-                                                    ? null
-                                                    : () {
+                                          child:
+                                              isCompletelyBlank
+                                                  ? const SizedBox.shrink()
+                                                  : IconButton(
+                                                    icon: Icon(
+                                                      isPdf(link)
+                                                          ? Icons.picture_as_pdf
+                                                          : Icons.image,
+                                                      color:
+                                                          isPdf(link)
+                                                              ? AppColors
+                                                                  .compulsory
+                                                              : AppColors
+                                                                  .vibrantgreen,
+                                                    ),
+                                                    onPressed: () {
                                                       final pdfUrl =
                                                           (d["file_upload_location"]
                                                                       ?.toString()
@@ -250,7 +279,7 @@ class _GrListState extends State<GrList> {
                                                         );
                                                       }
                                                     },
-                                          ),
+                                                  ),
                                         ),
                                       ],
                                     );

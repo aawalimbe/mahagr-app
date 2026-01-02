@@ -107,75 +107,78 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
 
           actions: [
-            PopupMenuButton<String>(
-              icon: Container(
-                width: 25.w,
-                height: 40.h,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color:
-                        isDark
-                            ? AppColors.darkTextPrimaryColor
-                            : AppColors.textOnDark,
-                    width: 2,
+            Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: PopupMenuButton<String>(
+                icon: Container(
+                  width: 25.w,
+                  height: 40.h,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color:
+                          isDark
+                              ? AppColors.darkTextPrimaryColor
+                              : AppColors.textOnDark,
+                      width: 2,
+                    ),
+                  ),
+                  child: Transform.translate(
+                    offset: const Offset(-4, 0),
+                    child: const Icon(Icons.more_vert, size: 30),
                   ),
                 ),
-                child: Transform.translate(
-                  offset: const Offset(-4, 0),
-                  child: const Icon(Icons.more_vert, size: 30),
-                ),
+                onSelected: (value) {
+                  switch (value) {
+                    case 'customs_notification':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const CustomsNotifictions(),
+                        ),
+                      );
+                      break;
+                    case 'give_suggestions':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const GiveSuggestions(),
+                        ),
+                      );
+                      break;
+                    case 'share_documents':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ShareDocs()),
+                      );
+                      break;
+                    case 'logout':
+                      logout(context);
+                      break;
+                  }
+                },
+                itemBuilder:
+                    (_) => [
+                      _menuItem('share_app', Icons.share, 'Share App'),
+                      _menuItem(
+                        'customs_notification',
+                        Icons.notifications_active,
+                        'Manage Notification',
+                      ),
+                      _menuItem(
+                        'give_suggestions',
+                        Icons.feedback,
+                        'Give Suggestions',
+                      ),
+                      _menuItem(
+                        'share_documents',
+                        Icons.upload_file,
+                        'Upload Documents',
+                      ),
+                      _menuItem('logout', Icons.logout_outlined, 'Logout'),
+                    ],
               ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'customs_notification':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CustomsNotifictions(),
-                      ),
-                    );
-                    break;
-                  case 'give_suggestions':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const GiveSuggestions(),
-                      ),
-                    );
-                    break;
-                  case 'share_documents':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ShareDocs()),
-                    );
-                    break;
-                  case 'logout':
-                    logout(context);
-                    break;
-                }
-              },
-              itemBuilder:
-                  (_) => [
-                    _menuItem('share_app', Icons.share, 'Share App'),
-                    _menuItem(
-                      'customs_notification',
-                      Icons.notifications_active,
-                      'Manage Notification',
-                    ),
-                    _menuItem(
-                      'give_suggestions',
-                      Icons.feedback,
-                      'Give Suggestions',
-                    ),
-                    _menuItem(
-                      'share_documents',
-                      Icons.upload_file,
-                      'Upload Documents',
-                    ),
-                    _menuItem('logout', Icons.logout_outlined, 'Logout'),
-                  ],
             ),
           ],
         );
