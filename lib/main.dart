@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,13 +9,18 @@ import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  //initializes Flutter’s engine and platform bindings before
+  //initializes Flutter's engine and platform bindings before
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  if (!kIsWeb) {
-    await Firebase.initializeApp();
-  }
+  // Initialize Firebase (optional - uncomment if Firebase is configured)
+  // if (!kIsWeb) {
+  //   try {
+  //     await Firebase.initializeApp();
+  //   } catch (e) {
+  //     debugPrint('Firebase initialization failed: $e');
+  //   }
+  // }
+  
   // Initialize API service
   ApiService.initialize();
 

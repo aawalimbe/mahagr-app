@@ -3,38 +3,46 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdfx/pdfx.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:share_plus/share_plus.dart';
-
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/viewer_bottomNevigator.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 
 class PdfViewer extends StatefulWidget {
+  final String pdfUrl;
   final String documentTitle;
 
-  const PdfViewer({super.key, required this.documentTitle});
+  const PdfViewer({
+    super.key,
+    required this.pdfUrl,
+    required this.documentTitle,
+  });
 
   @override
   State<PdfViewer> createState() => _PdfViewerState();
 }
 
 class _PdfViewerState extends State<PdfViewer> {
-  PdfControllerPinch? _pdfController;
-
+  GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
   bool _isLoading = true;
+  String? _error;
+  File? _downloadedFile;
   bool _isPortrait = true;
   bool _isDownloading = false;
-
-  String? _error;
-  File? _localPdfFile;
 
   @override
   void initState() {
     super.initState();
-    _loadLocalPdf();
+    // Lock to portrait initially
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    _loadPDF();
   }
 
-  Future<void> _loadLocalPdf() async {
+  Future<void> _loadPDF() async {
     try {
       setState(() {
         _isLoading = true;
@@ -42,53 +50,54 @@ class _PdfViewerState extends State<PdfViewer> {
       });
 
       final dir = await getApplicationDocumentsDirectory();
-      final file = File('${dir.path}/DOC-20251216-WA0020..pdf');
+      final sanitizedName = widget.documentTitle
+          .replaceAll(RegExp(r"[^\w\s-]"), "")
+          .replaceAll(RegExp(r"\s+"), "_");
+      final file = File("${dir.path}/$sanitizedName.pdf");
 
+      // Check if file already exists, if not download it
       if (!await file.exists()) {
-        final bytes = await rootBundle.load(
-          'assets/images/original/DOC-20251216-WA0020..pdf',
-        );
-        await file.writeAsBytes(bytes.buffer.asUint8List());
+        final bytes = await ApiService.downloadFilefromUrl(widget.pdfUrl);
+        await file.writeAsBytes(bytes);
       }
-
-      _localPdfFile = file;
-
-      _pdfController ??= PdfControllerPinch(
-        document: PdfDocument.openFile(file.path),
-      );
+      _downloadedFile = file;
 
       setState(() => _isLoading = false);
     } catch (e) {
       setState(() {
         _isLoading = false;
-        _error = 'Failed to load PDF: $e';
+        _error = "Error loading PDF: $e";
       });
     }
   }
 
   void _rotate() {
+    // Simply toggle rotation state - no device orientation change
+    // This will only rotate the PDF viewer widget visually
     setState(() {
       _isPortrait = !_isPortrait;
+      // Create new key to force PDF viewer to rebuild with new orientation
+      _pdfViewerKey = GlobalKey<SfPdfViewerState>();
     });
   }
 
   Future<void> _share() async {
-    if (_localPdfFile == null) return;
+    if (_downloadedFile == null) return;
 
     await Share.shareXFiles([
-      XFile(_localPdfFile!.path),
-    ], text: widget.documentTitle);
+      XFile(_downloadedFile!.path),
+    ], text: "Sharing: ${widget.documentTitle}");
   }
 
   Future<void> _download() async {
-    if (_localPdfFile == null) return;
+    if (_downloadedFile == null) return;
 
     setState(() => _isDownloading = true);
 
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(const Duration(milliseconds: 500));
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('PDF saved at: ${_localPdfFile!.path}')),
+      SnackBar(content: Text("PDF saved at: ${_downloadedFile!.path}")),
     );
 
     setState(() => _isDownloading = false);
@@ -96,7 +105,11 @@ class _PdfViewerState extends State<PdfViewer> {
 
   @override
   void dispose() {
-    _pdfController?.dispose();
+    // Reset orientation to portrait when leaving
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -104,33 +117,82 @@ class _PdfViewerState extends State<PdfViewer> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: CustomScaffold(
-        body:
-            _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _error != null
                 ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _error!,
-                        style: const TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _error!,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton(
+                          onPressed: _loadPDF,
+                          child: const Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  )
+                : _downloadedFile != null
+                    ? LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Get available space (after AppBar and bottom nav)
+                          final availableWidth = constraints.maxWidth;
+                          final availableHeight = constraints.maxHeight;
+                          
+                          // Get full screen dimensions using MediaQuery
+                          final mediaQuery = MediaQuery.of(context);
+                          final screenWidth = mediaQuery.size.width;
+                          final screenHeight = mediaQuery.size.height;
+                          
+                          if (_isPortrait) {
+                            // Portrait mode - display normally using full available space
+                            return SizedBox(
+                              width: availableWidth,
+                              height: availableHeight,
+                              child: SfPdfViewer.file(
+                                _downloadedFile!,
+                                key: _pdfViewerKey,
+                                enableDoubleTapZooming: true,
+                                enableTextSelection: true,
+                              ),
+                            );
+                          } else {
+                            // Landscape mode - rotate only the PDF viewer widget
+                            // Use OverflowBox with full screen dimensions to fill entire width
+                            return OverflowBox(
+                              maxWidth: screenHeight, // After rotation, this becomes the width
+                              maxHeight: screenWidth, // After rotation, this becomes the height
+                              alignment: Alignment.center,
+                              child: Transform.rotate(
+                                angle: math.pi / 2,
+                                alignment: Alignment.center,
+                                child: SizedBox(
+                                  // After 90-degree rotation:
+                                  // - screenHeight becomes the width (fills full screen width)
+                                  // - screenWidth becomes the height
+                                  // This ensures the rotated PDF uses full screen width
+                                  width: screenHeight,
+                                  height: screenWidth,
+                                  child: SfPdfViewer.file(
+                                    _downloadedFile!,
+                                    key: _pdfViewerKey,
+                                    enableDoubleTapZooming: true,
+                                    enableTextSelection: true,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      )
+                    : const Center(
+                        child: Text("PDF file not available"),
                       ),
-                      const SizedBox(height: 12),
-                      ElevatedButton(
-                        onPressed: _loadLocalPdf,
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                )
-                : Center(
-                  child: Transform.rotate(
-                    angle: _isPortrait ? 0 : math.pi / 2,
-                    child: PdfViewPinch(controller: _pdfController!),
-                  ),
-                ),
         bottomNavigationBar: ViewerBottomNavigator(
           onShare: _share,
           onDownload: _isDownloading ? () {} : _download,
@@ -140,203 +202,3 @@ class _PdfViewerState extends State<PdfViewer> {
     );
   }
 }
-
-
-
-
-
-// import 'dart:io';
-// import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:path_provider/path_provider.dart';
-// import 'package:pdfx/pdfx.dart';
-// import 'package:share_plus/share_plus.dart';
-// import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
-// import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/viewer_bottomNevigator.dart';
-// import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
-
-// class PdfViewer extends StatefulWidget {
-//   final String pdfUrl;
-//   final String documentTitle;
-
-//   const PdfViewer({
-//     super.key,
-//     required this.pdfUrl,
-//     required this.documentTitle,
-//   });
-
-//   @override
-//   State<PdfViewer> createState() => _PdfViewerState();
-// }
-
-// class _PdfViewerState extends State<PdfViewer> {
-//   PdfControllerPinch? _pdfController;
-//   bool _isLoading = true;
-//   String? _error;
-//   File? _downloadedFile;
-
-//   bool _isPortrait = true;
-//   bool _isDownloading = false;
-//   bool _isRotating = false;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _loadPDF();
-//   }
-
-//   Future<void> _loadPDF() async {
-//     try {
-//       setState(() {
-//         _isLoading = true;
-//         _error = null;
-//       });
-
-//       final dir = await getApplicationDocumentsDirectory();
-//       final sanitizedName = widget.documentTitle.replaceAll(
-//         RegExp(r"[^\w\s-]"),
-//         "",
-//       );
-//       final file = File("${dir.path}/$sanitizedName.pdf");
-
-//       // Check if file already exists, if not download it
-//       if (!await file.exists()) {
-//         final bytes = await ApiService.downloadFilefromUrl(widget.pdfUrl);
-//         await file.writeAsBytes(bytes);
-//       }
-//       _downloadedFile = file;
-
-//       // Only create controller if it doesn't exist
-//       if (_pdfController == null) {
-//         _pdfController = PdfControllerPinch(
-//           document: PdfDocument.openFile(file.path),
-//         );
-//       }
-
-//       setState(() => _isLoading = false);
-//     } catch (e) {
-//       setState(() {
-//         _isLoading = false;
-//         _error = "Error loading PDF: $e";
-//       });
-//     }
-//   }
-
-//   Future<void> _share() async {
-//     if (_downloadedFile != null) {
-//       await Share.shareXFiles([
-//         XFile(_downloadedFile!.path),
-//       ], text: "Sharing: ${widget.documentTitle}");
-//     } else {
-//       ScaffoldMessenger.of(
-//         context,
-//       ).showSnackBar(const SnackBar(content: Text("File not ready")));
-//     }
-//   }
-
-//   Future<void> _download() async {
-//     if (_downloadedFile == null) return;
-
-//     setState(() => _isDownloading = true);
-
-//     await Future.delayed(const Duration(milliseconds: 500));
-
-//     ScaffoldMessenger.of(context).showSnackBar(
-//       SnackBar(content: Text("PDF saved at: ${_downloadedFile!.path}")),
-//     );
-
-//     setState(() => _isDownloading = false);
-//   }
-
-//   void _rotate() async {
-//     if (_isRotating || !mounted) return;
-    
-//     setState(() {
-//       _isRotating = true;
-//     });
-    
-//     try {
-//       if (_isPortrait) {
-//         await SystemChrome.setPreferredOrientations([
-//           DeviceOrientation.landscapeLeft,
-//           DeviceOrientation.landscapeRight,
-//         ]);
-//       } else {
-//         await SystemChrome.setPreferredOrientations([
-//           DeviceOrientation.portraitUp,
-//           DeviceOrientation.portraitDown,
-//         ]);
-//       }
-
-//       if (mounted) {
-//         setState(() {
-//           _isPortrait = !_isPortrait;
-//         });
-        
-//         // Wait for widget tree and PDF to rebuild after orientation change
-//         // Add longer delay to ensure PDF has finished reloading before allowing navigation
-//         await Future.delayed(const Duration(milliseconds: 800));
-        
-//         // Wait for one more frame to ensure everything is stable
-//         await Future.delayed(const Duration(milliseconds: 100));
-        
-//         if (mounted) {
-//           setState(() {
-//             _isRotating = false;
-//           });
-//         }
-//       }
-//     } catch (e) {
-//       if (mounted) {
-//         setState(() {
-//           _isRotating = false;
-//         });
-//       }
-//     }
-//   }
-
-//   @override
-//   void dispose() {
-//     _pdfController?.dispose();
-//     SystemChrome.setPreferredOrientations([
-//       DeviceOrientation.portraitUp,
-//       DeviceOrientation.portraitDown,
-//     ]);
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return PopScope(
-//       canPop: !_isRotating && !_isLoading,
-//       child: SafeArea(
-//         child: CustomScaffold(
-//           body:
-//               _isLoading
-//                   ? const Center(child: CircularProgressIndicator())
-//                   : _error != null
-//                   ? Center(
-//                     child: Column(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         Text(_error!, style: const TextStyle(color: Colors.red)),
-//                         const SizedBox(height: 12),
-//                         ElevatedButton(
-//                           onPressed: _loadPDF,
-//                           child: const Text("Retry"),
-//                         ),
-//                       ],
-//                     ),
-//                   )
-//                   : PdfViewPinch(controller: _pdfController!),
-
-//           bottomNavigationBar: ViewerBottomNavigator(
-//             onShare: _share,
-//             onDownload: _isDownloading ? () {} : _download,
-//             onRotate: _rotate,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
