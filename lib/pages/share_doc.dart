@@ -232,7 +232,7 @@ class _ShareDocsState extends State<ShareDocs> {
         ),
         SizedBox(height: 3.h),
         Text(
-          'Supported formats: PDF, JPG, JPEG, PNG, DOC, DOCX',
+          'Supported format: PDF',
           style: AppTextStyles.regular(
             11.sp,
           ).copyWith(color: AppColors.secondaryText),
