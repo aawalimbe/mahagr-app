@@ -12,21 +12,17 @@ $response = array();
 $message = '';
 
 $message .= isset($_POST['title']) ? "" : "title not received\n";
-$message .= isset($_POST['category_id']) ? "" : "category_id not received\n";
-$message .= isset($_POST['gr_date']) ? "" : "gr_date not received\n";
 $message .= isset($_FILES['file']) ? "" : "file not received\n";
 
 if (empty($message)) {
     $title = trim($_POST['title']);
     $description = isset($_POST['description']) ? trim($_POST['description']) : '';
-    $category_id = $_POST['category_id'];
-    $gr_date = $_POST['gr_date'];
+    $category_id = isset($_POST['category_id']) && !empty($_POST['category_id']) ? $_POST['category_id'] : null;
+    $gr_date = isset($_POST['gr_date']) && !empty($_POST['gr_date']) ? $_POST['gr_date'] : null;
     $uploaded_by = isset($_POST['uploaded_by']) ? $_POST['uploaded_by'] : null;
     $file_upload = "";
 
     $message .= empty($title) ? "title can not be empty\n" : "";
-    $message .= empty($category_id) ? "category_id can not be empty\n" : "";
-    $message .= empty($gr_date) ? "gr_date can not be empty\n" : "";
 
     if (empty($message)) {
         if (isset($_FILES['file']) && $_FILES['file']['error'] === UPLOAD_ERR_OK) {
@@ -46,15 +42,28 @@ if (empty($message)) {
                 if (!ensureUploadsDirectory()) {
                     $message .= "Failed to create uploads directory\n";
                 } else {
-                    // Get category name for folder creation (following admin action.php pattern)
-                    $cat_query = "SELECT category_name FROM categories WHERE category_id = :category_id AND status = 'Active'";
-                    $cat_stmt = $connect->prepare($cat_query);
-                    $cat_stmt->execute(array(':category_id' => $category_id));
-                    $cat_result = $cat_stmt->fetch();
+                    $category_name = null;
+                    
+                    // If category_id is provided, get category name for folder creation
+                    if ($category_id !== null) {
+                        $cat_query = "SELECT category_name FROM categories WHERE category_id = :category_id AND status = 'Active'";
+                        $cat_stmt = $connect->prepare($cat_query);
+                        $cat_stmt->execute(array(':category_id' => $category_id));
+                        $cat_result = $cat_stmt->fetch();
 
-                    if ($cat_result) {
-                        // Sanitize category name for folder name (remove special characters)
-                        $category_name = sanitizeCategoryName($cat_result['category_name']);
+                        if ($cat_result) {
+                            // Sanitize category name for folder name (remove special characters)
+                            $category_name = sanitizeCategoryName($cat_result['category_name']);
+                        }
+                        // If category_id is invalid, we'll use default folder (don't fail)
+                    }
+                    
+                    // If category_id is not provided or invalid, use default folder
+                    if ($category_name === null) {
+                        $category_name = 'user_uploads';
+                    }
+                    
+                    if (empty($message)) {
                         
                         // Create upload directory path (relative to mahagr folder)
                         $upload_dir = __DIR__ . '/../uploads/' . $category_name;
@@ -62,7 +71,7 @@ if (empty($message)) {
                         // Create directory if it doesn't exist
                         if (!is_dir($upload_dir)) {
                             if (!mkdir($upload_dir, 0777, true)) {
-                                $message .= "Failed to create category folder\n";
+                                $message .= "Failed to create upload folder\n";
                             }
                         }
                         
@@ -81,8 +90,6 @@ if (empty($message)) {
                                 $message .= "Failed to upload file\n";
                             }
                         }
-                    } else {
-                        $message .= "Invalid category_id\n";
                     }
                 }
             }
