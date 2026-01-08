@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
-import 'api_list.dart';
+
 import 'api_config.dart';
+import 'api_list.dart';
 
 class ApiService {
   static final Dio _dio = Dio();
@@ -236,30 +238,163 @@ class ApiService {
   }
 
   // Upload document
+  // static Future<Map<String, dynamic>> uploadDocument({
+  //   required String title,
+  //   required String description,
+  //   required String filePath,
+  //   String? uploadedBy,
+  // }) async {
+  //   try {
+  //     final formData = FormData.fromMap({
+  //       'title': title,
+  //       'description': description,
+  //
+  //       'file': await MultipartFile.fromFile(
+  //         filePath,
+  //         filename: filePath.split('/').last,
+  //       ),
+  //       if (uploadedBy != null) 'uploaded_by': uploadedBy,
+  //     });
+  //
+  //     final response = await _dio.post(ApiList.documentUpload, data: formData);
+  //     return response.data;
+  //   } on DioException catch (e) {
+  //     throw _handleDioError(e);
+  //   } catch (e) {
+  //     throw Exception('Network error: $e');
+  //   }
+  // }
   static Future<Map<String, dynamic>> uploadDocument({
     required String title,
     required String description,
-    required String filePath,
+    required Uint8List fileBytes,
+    required String fileName,
     String? uploadedBy,
   }) async {
     try {
       final formData = FormData.fromMap({
         'title': title,
         'description': description,
-
-        'file': await MultipartFile.fromFile(
-          filePath,
-          filename: filePath.split('/').last,
-        ),
+        'file': MultipartFile.fromBytes(fileBytes, filename: fileName),
         if (uploadedBy != null) 'uploaded_by': uploadedBy,
       });
 
-      final response = await _dio.post(ApiList.documentUpload, data: formData);
-      return response.data;
+      // Create a separate Dio instance for file uploads without global Content-Type header
+      final uploadDio = Dio(
+        BaseOptions(
+          baseUrl: _dio.options.baseUrl,
+          connectTimeout: _dio.options.connectTimeout,
+          receiveTimeout: _dio.options.receiveTimeout,
+          headers: {'Accept': 'application/json'},
+          validateStatus: (status) => status != null && status < 500,
+        ),
+      );
+
+      // Add logging interceptor if enabled
+      if (ApiConfig.enableLogging) {
+        uploadDio.interceptors.add(
+          LogInterceptor(
+            requestBody: true,
+            responseBody: true,
+            logPrint: (obj) => print('DIO: $obj'),
+          ),
+        );
+      }
+
+      final response = await uploadDio.post(
+        ApiList.documentUpload,
+        data: formData,
+        options: Options(
+          responseType: ResponseType.plain,
+          validateStatus: (status) => true,
+        ),
+      );
+
+      // Check response status
+      if (response.statusCode != null && response.statusCode! >= 400) {
+        final errorBody = response.data?.toString() ?? '';
+        print('Server error response (${response.statusCode}): $errorBody');
+        throw Exception('Server error: ${response.statusCode}');
+      }
+
+      // Try to parse as JSON
+      try {
+        final responseData = response.data?.toString() ?? '';
+
+        // Check if response is HTML (PHP error)
+        if (responseData.trim().startsWith('<') ||
+            responseData.contains('<br') ||
+            responseData.contains('<b>')) {
+          print('Server returned HTML error page:');
+          print(responseData);
+          // Try to extract PHP error message
+          final errorPatterns = [
+            RegExp(r'<b>(.*?)</b>', dotAll: true),
+            RegExp(r'Fatal error[:\s]*(.*?)(?:<|$)', dotAll: true),
+            RegExp(r'Warning[:\s]*(.*?)(?:<|$)', dotAll: true),
+            RegExp(r'Parse error[:\s]*(.*?)(?:<|$)', dotAll: true),
+          ];
+
+          String? errorMessage;
+          for (final pattern in errorPatterns) {
+            final match = pattern.firstMatch(responseData);
+            if (match != null) {
+              errorMessage = match.group(1)?.trim();
+              if (errorMessage != null && errorMessage.isNotEmpty) {
+                break;
+              }
+            }
+          }
+
+          throw Exception(
+            errorMessage != null
+                ? 'Server error: $errorMessage'
+                : 'Server returned an error page. Please check server configuration.',
+          );
+        }
+
+        // Parse JSON response
+        if (responseData.isEmpty) {
+          throw Exception('Server returned empty response');
+        }
+
+        final decoded = json.decode(responseData) as Map<String, dynamic>;
+        return decoded;
+      } catch (parseError) {
+        if (parseError is Exception) {
+          rethrow;
+        }
+        print('Failed to parse server response: $parseError');
+        print('Raw response: ${response.data}');
+        throw Exception(
+          'Failed to parse server response. Server may have returned an error page.',
+        );
+      }
     } on DioException catch (e) {
+      if (e.response != null && e.response!.data != null) {
+        final responseData = e.response!.data;
+        if (responseData is String) {
+          print('Server returned HTML/Text instead of JSON:');
+          print(responseData);
+          // Try to extract error message from HTML
+          final errorMatch = RegExp(
+            r'<b>(.*?)</b>',
+            dotAll: true,
+          ).firstMatch(responseData);
+          if (errorMatch != null) {
+            throw Exception('Server error: ${errorMatch.group(1)}');
+          }
+          throw Exception(
+            'Server returned an error page. Please check server configuration.',
+          );
+        } else if (responseData is Map) {
+          print('Server error response: $responseData');
+        }
+      }
       throw _handleDioError(e);
     } catch (e) {
-      throw Exception('Network error: $e');
+      print('Upload error: $e');
+      rethrow;
     }
   }
 

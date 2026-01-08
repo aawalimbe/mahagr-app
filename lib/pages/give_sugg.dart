@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 
 class GiveSuggestions extends StatefulWidget {
   const GiveSuggestions({super.key});
@@ -27,8 +27,94 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
     super.dispose();
   }
 
+  // Future<void> _submitSuggestion() async {
+  //   if (!_formKey.currentState!.validate()) return;
+  //
+  //   setState(() {
+  //     _isSubmitting = true;
+  //     _errorMessage = null;
+  //     _successMessage = null;
+  //   });
+  //
+  //   try {
+  //     final response = await ApiService.submitSuggestion(
+  //       message: _suggestionController.text.trim(),
+  //       contact: null,
+  //     );
+  //
+  //     if (response['status'] == 'true') {
+  //       setState(() {
+  //         _successMessage =
+  //             response['message'] ?? 'Suggestion submitted successfully!';
+  //       });
+  //
+  //       _suggestionController.clear();
+  //
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text('Suggestion submitted successfully!'),
+  //             backgroundColor: AppColors.vibrantgreen,
+  //           ),
+  //         );
+  //       }
+  //
+  //       if (mounted) {
+  //         Future.delayed(const Duration(seconds: 2), () {
+  //           if (mounted) {
+  //             Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(builder: (context) => const HomePage()),
+  //             );
+  //           }
+  //         });
+  //       }
+  //     } else {
+  //       setState(() {
+  //         _errorMessage =
+  //             response['message'] ??
+  //             'Failed to submit suggestion. Please try again.';
+  //       });
+  //
+  //       if (mounted) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(
+  //             content: Text(
+  //               response['message'] ?? 'Failed to submit suggestion.',
+  //             ),
+  //             backgroundColor: AppColors.compulsory,
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     setState(() {
+  //       _errorMessage = 'Error submitting suggestion: $e';
+  //     });
+  //
+  //     if (mounted) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(
+  //           content: Text('Error submitting suggestion: $e'),
+  //           backgroundColor: AppColors.compulsory,
+  //         ),
+  //       );
+  //     }
+  //   } finally {
+  //     setState(() {
+  //       _isSubmitting = false;
+  //     });
+  //   }
+  // }
   Future<void> _submitSuggestion() async {
-    if (!_formKey.currentState!.validate()) return;
+    debugPrint('🔵 SubmitSuggestion: Method called');
+
+    if (!_formKey.currentState!.validate()) {
+      debugPrint('❌ SubmitSuggestion: Form validation failed');
+      return;
+    }
+
+    debugPrint('✅ SubmitSuggestion: Form validated');
 
     setState(() {
       _isSubmitting = true;
@@ -36,30 +122,43 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
       _successMessage = null;
     });
 
+    debugPrint('⏳ SubmitSuggestion: API call started');
+    debugPrint('📨 Message: ${_suggestionController.text.trim()}');
+
     try {
       final response = await ApiService.submitSuggestion(
         message: _suggestionController.text.trim(),
         contact: null,
       );
 
+      debugPrint('📥 SubmitSuggestion: API response received');
+      debugPrint('📦 Response: $response');
+
       if (response['status'] == 'true') {
+        debugPrint('✅ SubmitSuggestion: Submission successful');
+
         setState(() {
           _successMessage =
               response['message'] ?? 'Suggestion submitted successfully!';
         });
 
         _suggestionController.clear();
+        debugPrint('🧹 SubmitSuggestion: Text field cleared');
 
         if (mounted) {
+          debugPrint('🍫 SubmitSuggestion: Showing success SnackBar');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Suggestion submitted successfully!'),
+              content: const Text('Suggestion submitted successfully!'),
               backgroundColor: AppColors.vibrantgreen,
             ),
           );
         }
 
         if (mounted) {
+          debugPrint(
+            '⏱ SubmitSuggestion: Navigating to HomePage after 2 seconds',
+          );
           Future.delayed(const Duration(seconds: 2), () {
             if (mounted) {
               Navigator.pushReplacement(
@@ -70,6 +169,9 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
           });
         }
       } else {
+        debugPrint('⚠️ SubmitSuggestion: Submission failed');
+        debugPrint('📛 Error Message: ${response['message']}');
+
         setState(() {
           _errorMessage =
               response['message'] ??
@@ -88,6 +190,9 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
         }
       }
     } catch (e) {
+      debugPrint('🔥 SubmitSuggestion: Exception caught');
+      debugPrint('🧨 Error: $e');
+
       setState(() {
         _errorMessage = 'Error submitting suggestion: $e';
       });
@@ -101,6 +206,8 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
         );
       }
     } finally {
+      debugPrint('🔚 SubmitSuggestion: API process completed');
+
       setState(() {
         _isSubmitting = false;
       });
@@ -319,25 +426,6 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // import 'package:flutter/material.dart';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
@@ -419,7 +507,7 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
 //         setState(() {
 //           _errorMessage = response['message'] ?? 'Failed to submit suggestion. Please try again.';
 //         });
-        
+
 //         if (mounted) {
 //           ScaffoldMessenger.of(context).showSnackBar(
 //             SnackBar(
@@ -433,7 +521,7 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
 //       setState(() {
 //         _errorMessage = 'Error submitting suggestion: $e';
 //       });
-      
+
 //       if (mounted) {
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           SnackBar(
@@ -505,7 +593,7 @@ class _GiveSuggestionsState extends State<GiveSuggestions> {
 //                         style: AppTextStyles.regular(16.sp),
 //                       ),
 //                       SizedBox(height: 20.h),
-                      
+
 //                       // Contact Information (Optional)
 //                       Container(
 //                         padding: EdgeInsets.symmetric(horizontal: 10.w),

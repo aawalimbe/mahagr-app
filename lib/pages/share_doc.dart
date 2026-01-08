@@ -1,12 +1,11 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/home_page.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
+import '../reusable_or_snipit_widgets/colors.dart';
 
 class ShareDocs extends StatefulWidget {
   const ShareDocs({super.key});
@@ -19,7 +18,7 @@ class _ShareDocsState extends State<ShareDocs> {
   final _formKey = GlobalKey<FormState>();
   final _descriptionController = TextEditingController();
 
-  File? _selectedFile;
+  PlatformFile? _selectedFile;
   String? _selectedFileName;
 
   bool _isSubmitting = false;
@@ -37,11 +36,12 @@ class _ShareDocsState extends State<ShareDocs> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx'],
+        withData: true,
       );
 
-      if (result != null) {
+      if (result != null && result.files.single.bytes != null) {
         setState(() {
-          _selectedFile = File(result.files.single.path!);
+          _selectedFile = result.files.single;
           _selectedFileName = result.files.single.name;
         });
       }
@@ -63,28 +63,62 @@ class _ShareDocsState extends State<ShareDocs> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) return;
+    debugPrint('SUBMIT_FORM: triggered');
 
-    if (_selectedFile == null) {
-      _showSnackBar('Please select an attachment');
+    if (!_formKey.currentState!.validate()) {
+      debugPrint('SUBMIT_FORM: form validation failed');
+
       return;
     }
 
+    debugPrint('SUBMIT_FORM: form validation passed');
+
+    if (_selectedFile == null) {
+      debugPrint('SUBMIT_FORM: no file selected');
+
+      _showSnackBar('Please select an attachment');
+
+      return;
+    }
+
+    debugPrint('SUBMIT_FORM: file selected -> ${_selectedFile!.name}');
+
+    debugPrint(
+      'SUBMIT_FORM: description -> ${_descriptionController.text.trim()}',
+    );
+
     setState(() {
       _isSubmitting = true;
+
       _errorMessage = null;
+
       _successMessage = null;
     });
 
+    debugPrint('SUBMIT_FORM: uploading started');
+
     try {
       final response = await ApiService.uploadDocument(
-        title: "Document",
+        title: _descriptionController.text.trim(),
+
         description: _descriptionController.text.trim(),
-        filePath: _selectedFile!.path,
+
+        fileBytes: _selectedFile!.bytes!,
+
+        fileName: _selectedFile!.name,
+
         uploadedBy: "User",
       );
 
-      if (response['status'] == 'true') {
+      debugPrint('SUBMIT_FORM: API response -> $response');
+
+      final status = response['status'];
+      final isSuccess =
+          status == true || status?.toString().toLowerCase() == "true";
+
+      if (isSuccess) {
+        debugPrint('SUBMIT_FORM: upload success');
+
         setState(() {
           _successMessage =
               response['message'] ?? 'Document uploaded successfully!';
@@ -93,27 +127,48 @@ class _ShareDocsState extends State<ShareDocs> {
         _showSnackBar('Document uploaded successfully!');
 
         _descriptionController.clear();
+
         _selectedFile = null;
+
         _selectedFileName = null;
+
+        debugPrint('SUBMIT_FORM: form cleared, navigating to HomePage');
 
         Future.delayed(const Duration(seconds: 2), () {
           if (mounted) {
+            debugPrint('SUBMIT_FORM: navigation executed');
+
             Navigator.pushReplacement(
               context,
+
               MaterialPageRoute(builder: (context) => const HomePage()),
             );
+          } else {
+            debugPrint('SUBMIT_FORM: widget not mounted, navigation skipped');
           }
         });
       } else {
+        debugPrint('SUBMIT_FORM: upload failed -> ${response['message']}');
+
         setState(() => _errorMessage = response['message'] ?? 'Upload failed.');
+
         _showSnackBar(
           response['message'] ?? 'Upload failed. Please try again.',
         );
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('SUBMIT_FORM: exception occurred');
+
+      debugPrint('ERROR: $e');
+
+      debugPrint('STACKTRACE: $stackTrace');
+
       setState(() => _errorMessage = 'Error uploading document: $e');
+
       _showSnackBar('Error uploading document: $e');
     } finally {
+      debugPrint('SUBMIT_FORM: upload process finished');
+
       setState(() => _isSubmitting = false);
     }
   }

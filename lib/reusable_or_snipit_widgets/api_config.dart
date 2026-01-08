@@ -1,14 +1,10 @@
-enum ApiEnvironment {
-  production,
-  emulator,
-  local,
-}
+enum ApiEnvironment { production, emulator, local }
 
 class ApiConfig {
   // =========================================================
   // CONFIGURATION
   // =========================================================
-  
+
   /// Set the current environment here
   static const ApiEnvironment currentEnvironment = ApiEnvironment.production;
 
@@ -20,9 +16,10 @@ class ApiConfig {
   // =========================================================
 
   static const String _productionBaseUrl = 'https://mahagralert.com/crm/api/';
-  static const String _emulatorBaseUrl = 'http://10.0.2.2/mahagr/mahagr-app/api/';
-  static const String _localBaseUrl = 'http://localhost/mahagrweb/api/';
-  
+  static const String _emulatorBaseUrl =
+      'http://10.0.2.2/mahagr/mahagr-app/api/';
+  static const String _localBaseUrl = 'http://localhost/api/';
+
   // Physical Device Testing IP (Optional)
   static const String _physicalDeviceUrl = 'http://192.168.1.16/mahagrweb/api/';
 

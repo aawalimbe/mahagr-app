@@ -109,3 +109,9 @@ CREATE TABLE `file_metadata` (
   KEY `document_id` (`document_id`),
   CONSTRAINT `file_metadata_ibfk_1` FOREIGN KEY (`document_id`) REFERENCES `documents` (`document_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 11. FIX: Enable AUTO_INCREMENT on documents.document_id column
+-- This fix resolves the "Duplicate entry '0' for key 'PRIMARY'" error during document uploads
+-- Run this query to fix the issue:
+ALTER TABLE `documents`
+  MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT;

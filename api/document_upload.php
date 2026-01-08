@@ -5,8 +5,25 @@ require "core.inc.php";
 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
-header('Access-Control-Allow-Method: POST');
+header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Access-Control-Allow-Headers, Content-Type, Access-Control-Allow-Method, Authorization, X-Requested-With');
+
+// Handle OPTIONS request for CORS preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
+// Validate that request is multipart/form-data
+$contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && strpos($contentType, 'multipart/form-data') === false) {
+    $response = array(
+        "status" => 'false',
+        "message" => "Content-Type must be multipart/form-data for file uploads"
+    );
+    echo json_encode($response);
+    exit;
+}
 
 $response = array();
 $message = '';
@@ -21,6 +38,7 @@ if (empty($message)) {
     $gr_date = isset($_POST['gr_date']) && !empty($_POST['gr_date']) ? $_POST['gr_date'] : null;
     $uploaded_by = isset($_POST['uploaded_by']) ? $_POST['uploaded_by'] : null;
     $file_upload = "";
+    $target_path = "";
 
     $message .= empty($title) ? "title can not be empty\n" : "";
 
@@ -98,35 +116,52 @@ if (empty($message)) {
         }
 
         if (empty($message)) {
-            $query = "INSERT INTO `documents` (`title`, `description`, `category_id`, `file_type`, `file_url`, `gr_date`, `uploaded_by`, `status`) 
-                      VALUES (:title, :description, :category_id, :file_type, :file_url, :gr_date, :uploaded_by, :status)";
-            $statement = $connect->prepare($query);
-            $statement->execute(array(
-                ':title' => $title,
-                ':description' => $description,
-                ':category_id' => $category_id,
-                ':file_type' => $file_type,
-                ':file_url' => $file_upload,
-                ':gr_date' => $gr_date,
-                ':uploaded_by' => $uploaded_by,
-                ':status' => 'Active'
-            ));
+            try {
+                $query = "INSERT INTO `documents` (`title`, `description`, `category_id`, `file_type`, `file_url`, `gr_date`, `uploaded_by`, `status`) 
+                          VALUES (:title, :description, :category_id, :file_type, :file_url, :gr_date, :uploaded_by, :status)";
+                $statement = $connect->prepare($query);
+                $statement->execute(array(
+                    ':title' => $title,
+                    ':description' => $description,
+                    ':category_id' => $category_id,
+                    ':file_type' => $file_type,
+                    ':file_url' => $file_upload,
+                    ':gr_date' => $gr_date,
+                    ':uploaded_by' => $uploaded_by,
+                    ':status' => 'Active'
+                ));
 
-            if ($statement->rowCount() > 0) {
-                $document_id = $connect->lastInsertId();
-                $response["message"] = "Document uploaded successfully";
-                $response["status"] = 'true';
-                $response["document_id"] = $document_id;
-                $response["file_url"] = $file_upload;
-                $response["category_folder"] = $category_name;
-                echo json_encode($response);
-            } else {
+                if ($statement->rowCount() > 0) {
+                    $document_id = $connect->lastInsertId();
+                    $response["message"] = "Document uploaded successfully";
+                    $response["status"] = 'true';
+                    $response["document_id"] = $document_id;
+                    $response["file_url"] = $file_upload;
+                    $response["category_folder"] = $category_name;
+                    echo json_encode($response);
+                } else {
+                    // If database insertion fails, remove the uploaded file
+                    if (!empty($file_upload) && !empty($target_path) && file_exists($target_path)) {
+                        @unlink($target_path);
+                    }
+                    $response["message"] = "Unable to upload document to database";
+                    $response["status"] = 'false';
+                    echo json_encode($response);
+                }
+            } catch (PDOException $e) {
                 // If database insertion fails, remove the uploaded file
-                if (!empty($file_upload) && file_exists($target_path)) {
+                if (!empty($file_upload) && !empty($target_path) && file_exists($target_path)) {
                     @unlink($target_path);
                 }
-                $response["message"] = "Unable to upload document to database";
-                $response["status"] = 'false';
+                
+                // Check if error is related to AUTO_INCREMENT
+                if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'PRIMARY') !== false) {
+                    $response["message"] = "Database error: The document_id column requires AUTO_INCREMENT. Please run the database fix: ALTER TABLE `documents` MODIFY `document_id` int(11) NOT NULL AUTO_INCREMENT;";
+                    $response["status"] = 'false';
+                } else {
+                    $response["message"] = "Database error: " . $e->getMessage();
+                    $response["status"] = 'false';
+                }
                 echo json_encode($response);
             }
         } else {
