@@ -6,6 +6,7 @@ import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widget
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 import '../reusable_or_snipit_widgets/api_list.dart';
 import 'img_viewer.dart';
@@ -78,6 +79,14 @@ class _GrListState extends State<GrList> {
   bool isBlankRow(Map d) {
     return (d["gr_name"] == null || d["gr_name"].toString().trim().isEmpty) &&
         (d["date"] == null || d["date"].toString().trim().isEmpty);
+  }
+
+  Future<void> openInExternalBrowser(String url) async {
+    final Uri uri = Uri.parse(url);
+
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -220,7 +229,7 @@ class _GrListState extends State<GrList> {
                                                     icon: Icon(
                                                       isPdf(link)
                                                           ? Icons.picture_as_pdf
-                                                          : Icons.image,
+                                                          : null,
                                                       color:
                                                           isPdf(link)
                                                               ? AppColors
@@ -230,12 +239,31 @@ class _GrListState extends State<GrList> {
                                                     ),
                                                     onPressed: () {
                                                       // Get file URL - check if it's already a full URL
-                                                      final fileLocation = d["file_upload_location"]?.toString().trim() ?? '';
-                                                      final pdfUrl = (fileLocation.isNotEmpty)
-                                                          ? (fileLocation.startsWith('http://') || fileLocation.startsWith('https://'))
-                                                              ? fileLocation // Already a full URL, use as-is
-                                                              : ApiConfig.baseUrl.replaceAll('/api/', '/') + fileLocation // Construct URL
-                                                          : d["gr_link"] ?? '';
+                                                      final fileLocation =
+                                                          d["file_upload_location"]
+                                                              ?.toString()
+                                                              .trim() ??
+                                                          '';
+                                                      final pdfUrl =
+                                                          (fileLocation
+                                                                  .isNotEmpty)
+                                                              ? (fileLocation.startsWith(
+                                                                        'http://',
+                                                                      ) ||
+                                                                      fileLocation
+                                                                          .startsWith(
+                                                                            'https://',
+                                                                          ))
+                                                                  ? fileLocation // Already a full URL, use as-is
+                                                                  : ApiConfig
+                                                                          .baseUrl
+                                                                          .replaceAll(
+                                                                            '/api/',
+                                                                            '/',
+                                                                          ) +
+                                                                      fileLocation // Construct URL
+                                                              : d["gr_link"] ??
+                                                                  '';
 
                                                       final title =
                                                           d["gr_name"] ?? "";
@@ -248,25 +276,16 @@ class _GrListState extends State<GrList> {
                                                                 (
                                                                   _,
                                                                 ) => PdfViewer(
-                                                                  pdfUrl: pdfUrl,
-                                                                  documentTitle: title,
-                                                                ),
-                                                          ),
-                                                        );
-                                                      } else {
-                                                        Navigator.push(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder:
-                                                                (
-                                                                  _,
-                                                                ) => ImageViewer(
-                                                                  imageUrl:
+                                                                  pdfUrl:
                                                                       pdfUrl,
                                                                   documentTitle:
                                                                       title,
                                                                 ),
                                                           ),
+                                                        );
+                                                      } else {
+                                                        openInExternalBrowser(
+                                                          pdfUrl,
                                                         );
                                                       }
                                                     },
