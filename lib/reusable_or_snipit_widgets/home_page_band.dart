@@ -1,13 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/notification_page.dart';
-import 'package:provider/provider.dart';
+import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
-import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 class HomePageBand extends StatelessWidget {
   const HomePageBand({super.key});
+  Future<File> _getImageFileFromAssets(String assetPath) async {
+    final byteData = await rootBundle.load(assetPath);
+    final tempDir = await getTemporaryDirectory();
+    final file = File('${tempDir.path}/logo.png');
+
+    await file.writeAsBytes(byteData.buffer.asUint8List());
+    return file;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +46,39 @@ class HomePageBand extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.share),
                   tooltip: 'Share',
-                  onPressed: () {},
                   iconSize: 27,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
+                  onPressed: () async {
+                    final imageFile = await _getImageFileFromAssets(
+                      'assets/images/original/logo.png',
+                    );
+
+                    await Share.shareXFiles(
+                      [XFile(imageFile.path)],
+                      text: '''🔔 *महाGR Alert अ‍ॅप लाँच* ! 📱
+*शासकीय माहिती आता एका क्लिकवर!*
+
+शासकीय अधिकारी/कर्मचारी, लोकप्रतिनिधी, सामाजिक क्षेत्रात काम करणारे व्यक्ती व नागरीक यांच्यासाठी उपयुक्त *“महाGR Alert अ‍ॅप”* 🚀 लाँच झाले आहे!
+
+*अ‍ॅपची वैशिष्ट्ये*
+✅ कायदे, नियम, शासन निर्णय, परिपत्रके 📋
+✅ विषय/उपविषयानुसार सुलभ वर्गवारी 🗂️
+✅ सर्च 🔍 व फिल्टर
+✅ डेली नोटिफिकेशन 🔔
+✅ डाऊनलोड सुविधा 📥
+✅ डॉक्युमेंट Save सुविधा
+✅ अद्ययावत माहिती 📈
+✅ युझर फ्रेंडली Interface 😊
+
+📲 Google Play Store 🛒 / App Store 🍎
+*“महाGR Alert”* अ‍ॅप डाउनलोड करा!
+
+👉 https://example.com/app-link
+''',
+                      subject: 'महाGR Alert App',
+                    );
+                  },
                 ),
                 Text('Share App', style: AppTextStyles.regular(10)),
               ],
