@@ -14,10 +14,32 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
+
+    _controller.forward();
     _navigate();
   }
 
@@ -38,22 +60,31 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final double logoSize = MediaQuery.of(context).size.width * 0.55;
+
     return Scaffold(
-      backgroundColor: AppColors.textOnDark,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: AppColors.backgroundColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/images/original/logo.png',
-              width: 270.w,
-              height: 270.w,
+      backgroundColor: AppColors.backgroundColor,
+      body: SafeArea(
+        child: Center(
+          child: FadeTransition(
+            opacity: _opacityAnimation,
+            child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Image.asset(
+                'assets/images/original/logo.png',
+                width: logoSize.clamp(160.w, 300.w),
+                height: logoSize.clamp(160.w, 300.w),
+                fit: BoxFit.contain,
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
