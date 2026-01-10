@@ -152,7 +152,7 @@ class StartPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 20.h),
                   Container(
                     width: double.infinity,
                     //height: 50.h,

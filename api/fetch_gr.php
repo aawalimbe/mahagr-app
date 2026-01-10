@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 $data = json_decode(file_get_contents('php://input'), true);
 
 // Get parameters from both POST data and GET parameters
+$sub_sub_category_id = isset($data['sub_sub_category_id']) ? $data['sub_sub_category_id'] : (isset($_GET['sub_sub_category_id']) ? $_GET['sub_sub_category_id'] : 0);
 $sub_category_id = isset($data['sub_category_id']) ? $data['sub_category_id'] : (isset($_GET['sub_category_id']) ? $_GET['sub_category_id'] : 0);
 $category_id = isset($data['category_id']) ? $data['category_id'] : (isset($_GET['category_id']) ? $_GET['category_id'] : 0);
 $subject_id = isset($data['subject_id']) ? $data['subject_id'] : (isset($_GET['subject_id']) ? $_GET['subject_id'] : null);
@@ -24,10 +25,32 @@ $status_filter = isset($data['status']) ? $data['status'] : (isset($_GET['status
 
 try {
     // Determine which filter to use based on priority
-    if ($sub_category_id != 0) {
+    if ($sub_sub_category_id != 0) {
+        // Fetch GR list based on sub_sub_category_id
+        if ($status_filter && $status_filter !== 'All') {
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+                      FROM gr_master 
+                      WHERE sub_sub_category_id = :sub_sub_category_id AND status = :status 
+                      ORDER BY gr_id DESC, date DESC";
+            $statement = $connect->prepare($query);
+            $statement->execute(array(
+                ':sub_sub_category_id' => $sub_sub_category_id,
+                ':status' => $status_filter
+            ));
+        } else {
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+                      FROM gr_master 
+                      WHERE sub_sub_category_id = :sub_sub_category_id 
+                      ORDER BY gr_id DESC, date DESC";
+            $statement = $connect->prepare($query);
+            $statement->execute(array(':sub_sub_category_id' => $sub_sub_category_id));
+        }
+        $filter_used = 'sub_sub_category_id';
+        $filter_value = $sub_sub_category_id;
+    } elseif ($sub_category_id != 0) {
         // Fetch GR list based on sub_category_id
         if ($status_filter && $status_filter !== 'All') {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE sub_category_id = :sub_category_id AND status = :status 
                       ORDER BY gr_id DESC, date DESC";
@@ -37,7 +60,7 @@ try {
                 ':status' => $status_filter
             ));
         } else {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE sub_category_id = :sub_category_id 
                       ORDER BY gr_id DESC, date DESC";
@@ -49,7 +72,7 @@ try {
     } elseif ($category_id != 0) {
         // Fetch GR list based on category_id
         if ($status_filter && $status_filter !== 'All') {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE category_id = :category_id AND status = :status 
                       ORDER BY gr_id DESC, date DESC";
@@ -59,7 +82,7 @@ try {
                 ':status' => $status_filter
             ));
         } else {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE category_id = :category_id 
                       ORDER BY gr_id DESC, date DESC";
@@ -71,7 +94,7 @@ try {
     } elseif ($subject_id) {
         // Fetch GR list based on subject_id
         if ($status_filter && $status_filter !== 'All') {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE subject_id = :subject_id AND status = :status 
                       ORDER BY gr_id DESC, date DESC";
@@ -81,7 +104,7 @@ try {
                 ':status' => $status_filter
             ));
         } else {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE subject_id = :subject_id 
                       ORDER BY gr_id DESC, date DESC";
@@ -93,16 +116,16 @@ try {
     } else {
         // Fetch all GR records
         if ($status_filter && $status_filter !== 'All') {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
                       WHERE status = :status 
-                      ORDER BY subject_id ASC, category_id ASC, sub_category_id ASC, gr_id DESC";
+                      ORDER BY subject_id ASC, category_id ASC, sub_category_id ASC, sub_sub_category_id ASC, gr_id DESC";
             $statement = $connect->prepare($query);
             $statement->execute(array(':status' => $status_filter));
         } else {
-            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
+            $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 
-                      ORDER BY subject_id ASC, category_id ASC, sub_category_id ASC, gr_id DESC";
+                      ORDER BY subject_id ASC, category_id ASC, sub_category_id ASC, sub_sub_category_id ASC, gr_id DESC";
             $statement = $connect->prepare($query);
             $statement->execute();
         }
@@ -121,6 +144,7 @@ try {
             'subject_id' => $subject_id,
             'category_id' => $category_id,
             'sub_category_id' => $sub_category_id,
+            'sub_sub_category_id' => $sub_sub_category_id,
             'status_filter' => $status_filter,
             'gr_list' => $output
         );
@@ -128,7 +152,9 @@ try {
         echo json_encode($response);
     } else {
         $message = '';
-        if ($sub_category_id != 0) {
+        if ($sub_sub_category_id != 0) {
+            $message = "No GR records found for sub_sub_category_id: $sub_sub_category_id";
+        } elseif ($sub_category_id != 0) {
             $message = "No GR records found for sub_category_id: $sub_category_id";
         } elseif ($category_id != 0) {
             $message = "No GR records found for category_id: $category_id";
@@ -146,6 +172,7 @@ try {
             'subject_id' => $subject_id,
             'category_id' => $category_id,
             'sub_category_id' => $sub_category_id,
+            'sub_sub_category_id' => $sub_sub_category_id,
             'status_filter' => $status_filter,
             'gr_list' => array()
         ));
@@ -159,6 +186,7 @@ try {
         'subject_id' => $subject_id,
         'category_id' => $category_id,
         'sub_category_id' => $sub_category_id,
+        'sub_sub_category_id' => $sub_sub_category_id,
         'status_filter' => $status_filter,
         'gr_list' => array()
     ));

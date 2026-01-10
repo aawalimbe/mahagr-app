@@ -47,6 +47,8 @@ class ApiList {
   static const String fetchSubjects = 'fetch_subjects.php';
   static final String FetchCategories = '${baseUrl}fetch_categories.php';
   static final String FetchSubcategories = '${baseUrl}fetch_subcategories.php';
+  static final String FetchSubSubcategories =
+      '${baseUrl}fetch_sub_sub_categories.php';
   static final String FetchGR = '${baseUrl}fetch_gr.php';
 
   // Test and Utility APIs

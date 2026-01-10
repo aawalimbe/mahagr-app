@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../reusable_or_snipit_widgets/api_list.dart';
-import 'img_viewer.dart';
 import 'pdf_viewer.dart';
 
 class GrList extends StatefulWidget {

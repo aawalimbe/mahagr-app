@@ -20,7 +20,7 @@ dependencies {
 }
 android {
     namespace = "com.example.forrest_department_gr_and_updatees_app"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.2.12479018"
 
     compileOptions {

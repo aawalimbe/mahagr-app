@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/sub_dept1.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/sub_sub_departments.dart';
 import 'dart:convert';
-
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/custom_scaffold.dart';
@@ -71,6 +71,17 @@ class _SubDeptState extends State<SubDept> {
                     itemCount: _subDepartments.length,
                     itemBuilder: (context, index) {
                       final subDept = _subDepartments[index];
+                      final int subjectId =
+                          int.tryParse(subDept['subject_id'].toString()) ?? 0;
+
+                      final int categoryId =
+                          int.tryParse(subDept['category_id'].toString()) ?? 0;
+
+                      final String departmentNameMar =
+                          subDept['name_mar']?.toString() ?? '';
+
+                      final String departmentNameEng =
+                          subDept['name_eng']?.toString() ?? '';
 
                       final fullName =
                           lang == 'mar'
@@ -91,15 +102,11 @@ class _SubDeptState extends State<SubDept> {
                                 context,
                                 MaterialPageRoute(
                                   builder:
-                                      (context) => SubSubDepartments(
-                                        subjectId: 14,
-
-                                        departmentNameMar:
-                                            (subDept['name_mar'] ?? '')
-                                                .toString(),
-                                        departmentNameEng:
-                                            (subDept['name_eng'] ?? '')
-                                                .toString(),
+                                      (context) => SubDept1(
+                                        subjectId: subjectId,
+                                        categoryId: categoryId,
+                                        departmentNameMar: departmentNameMar,
+                                        departmentNameEng: departmentNameEng,
                                       ),
                                 ),
                               );
