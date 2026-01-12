@@ -1,9 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/app_text.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/colors.dart';
-import 'package:file_picker/file_picker.dart';
-import 'dart:io';
 
 class ContactUs extends StatefulWidget {
   const ContactUs({super.key});
@@ -46,7 +47,7 @@ class _ContactUsState extends State<ContactUs> {
         });
       }
     } catch (e) {
-      _showSnackBar('Error picking file: $e');
+      _showSnackBar('Error picking file');
     }
   }
 
@@ -57,143 +58,130 @@ class _ContactUsState extends State<ContactUs> {
   }
 
   Future<void> _submitForm() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isSubmitting = true);
+
+    await Future.delayed(const Duration(seconds: 2));
+
+    _showSnackBar('Form submitted successfully');
+
+    _nameController.clear();
+    _emailController.clear();
+    _subjectController.clear();
+    _descriptionController.clear();
 
     setState(() {
-      _isSubmitting = true;
+      _selectedFile = null;
+      _selectedFileName = null;
+      _isSubmitting = false;
     });
-
-    try {
-      // Simulate API call
-      await Future.delayed(const Duration(seconds: 2));
-
-      _showSnackBar('Form submitted successfully!');
-
-      // Clear all form fields
-      _nameController.clear();
-      _emailController.clear();
-      _subjectController.clear();
-      _descriptionController.clear();
-
-      // Clear file attachment
-      setState(() {
-        _selectedFile = null;
-        _selectedFileName = null;
-      });
-    } catch (e) {
-      _showSnackBar('Error submitting form: $e');
-    } finally {
-      setState(() {
-        _isSubmitting = false;
-      });
-    }
   }
 
-  Widget _buildRequiredField(
+  Widget _requiredField(
     String label,
     TextEditingController controller, {
     TextInputType? keyboardType,
-    int? maxLines = 1,
+    int maxLines = 1,
     String? Function(String?)? validator,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(label, style: AppTextStyles.medium(14.sp)),
-            SizedBox(width: 4.w),
-            Container(
-              width: 6.w,
-              height: 6.w,
-              decoration: BoxDecoration(
-                color: AppColors.compulsory,
-                shape: BoxShape.circle,
+    return Padding(
+      padding: EdgeInsets.only(bottom: 18.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(label, style: AppTextStyles.medium(14.sp)),
+              SizedBox(width: 4.w),
+              Container(
+                width: 6.w,
+                height: 6.w,
+                decoration: BoxDecoration(
+                  color: AppColors.compulsory,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 6.h),
+          TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            validator:
+                validator ??
+                (value) =>
+                    value == null || value.trim().isEmpty
+                        ? '$label is required'
+                        : null,
+            decoration: InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.r),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.r),
+                borderSide: BorderSide(
+                  color: AppColors.primaryColor,
+                  width: 1.2,
+                ),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12.w,
+                vertical: 12.h,
               ),
             ),
-          ],
-        ),
-        SizedBox(height: 3.h),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          validator:
-              validator ??
-              (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return '$label is required';
-                }
-                return null;
-              },
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: 12.w,
-              vertical: 12.h,
-            ),
           ),
-        ),
-        SizedBox(height: 16.h),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildAttachmentField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Attachment', style: AppTextStyles.medium(16.sp)),
-        SizedBox(height: 8.h),
-        Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(12.w),
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(8.r),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _selectedFileName ?? 'No file selected',
-                      style: AppTextStyles.regular(12.sp),
-                    ),
+  Widget _attachmentField() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 24.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Attachment (Optional)', style: AppTextStyles.medium(14.sp)),
+          SizedBox(height: 8.h),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(8.r),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    _selectedFileName ?? 'No file selected',
+                    style: AppTextStyles.regular(12.sp),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  TextButton.icon(
-                    onPressed: _pickFile,
-                    icon: const Icon(Icons.attach_file),
-                    label: Text(
-                      'Choose File',
-                      style: AppTextStyles.regular(12.sp),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: AppColors.primaryColor,
-                    ),
+                ),
+                TextButton(
+                  onPressed: _pickFile,
+                  child: Text(
+                    'Choose File',
+                    style: AppTextStyles.medium(
+                      12.sp,
+                    ).copyWith(color: AppColors.primaryColor),
                   ),
-                ],
-              ),
-              if (_selectedFileName != null) ...[
-                SizedBox(height: 8.h),
-                Text(
-                  'Supported formats: PDF, JPG, JPEG, PNG',
-                  style: AppTextStyles.regular(
-                    12.sp,
-                  ).copyWith(color: AppColors.secondaryText),
                 ),
               ],
-            ],
+            ),
           ),
-        ),
-        SizedBox(height: 16.h),
-      ],
+          SizedBox(height: 6.h),
+          Text(
+            'Supported formats: PDF, JPG, JPEG, PNG',
+            style: AppTextStyles.regular(
+              11.sp,
+            ).copyWith(color: AppColors.secondaryText),
+          ),
+        ],
+      ),
     );
   }
 
@@ -205,8 +193,7 @@ class _ContactUsState extends State<ContactUs> {
           toolbarHeight: 60.h,
           backgroundColor: AppColors.primaryColor,
           centerTitle: true,
-          iconTheme: IconThemeData(color: AppColors.textOnDark, size: 30.w),
-
+          iconTheme: IconThemeData(color: AppColors.textOnDark, size: 24.sp),
           title: Text(
             'Contact Us',
             style: AppTextStyles.bold(
@@ -215,69 +202,58 @@ class _ContactUsState extends State<ContactUs> {
           ),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back button and title in body
                 Text(
-                  'Please fill in all required fields marked with red dots',
+                  'Please fill in all required fields marked with red dots.',
                   style: AppTextStyles.regular(
                     12.sp,
                   ).copyWith(color: AppColors.secondaryText),
                 ),
                 SizedBox(height: 24.h),
 
-                _buildRequiredField('Name', _nameController),
-
-                _buildRequiredField(
+                _requiredField('Name', _nameController),
+                _requiredField(
                   'Email',
                   _emailController,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
+                    if (value == null || value.isEmpty) {
                       return 'Email is required';
                     }
                     if (!RegExp(
                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                     ).hasMatch(value)) {
-                      return 'Please enter a valid email address';
+                      return 'Enter a valid email';
                     }
                     return null;
                   },
                 ),
-
-                _buildRequiredField('Subject', _subjectController),
-
-                _buildRequiredField(
+                _requiredField('Subject', _subjectController),
+                _requiredField(
                   'Description',
                   _descriptionController,
-                  maxLines: 2,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Description is required';
-                    }
-                    if (value.trim().length < 10) {
-                      return 'Description must be at least 10 characters long';
-                    }
-                    return null;
-                  },
+                  maxLines: 3,
+                  validator:
+                      (value) =>
+                          value != null && value.length >= 10
+                              ? null
+                              : 'Minimum 10 characters required',
                 ),
 
-                _buildAttachmentField(),
-
-                SizedBox(height: 24.h),
+                _attachmentField(),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 50.h,
+                  height: 48.h,
                   child: ElevatedButton(
                     onPressed: _isSubmitting ? null : _submitForm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryColor,
-                      foregroundColor: AppColors.textOnDark,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.r),
                       ),
@@ -285,11 +261,11 @@ class _ContactUsState extends State<ContactUs> {
                     child:
                         _isSubmitting
                             ? SizedBox(
-                              width: 20.w,
-                              height: 20.w,
+                              width: 22.w,
+                              height: 22.w,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
+                                valueColor: AlwaysStoppedAnimation(
                                   AppColors.textOnDark,
                                 ),
                               ),
