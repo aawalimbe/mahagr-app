@@ -24,9 +24,9 @@ $subject_id = isset($data['subject_id']) ? $data['subject_id'] : (isset($_GET['s
 $status_filter = isset($data['status']) ? $data['status'] : (isset($_GET['status']) ? $_GET['status'] : 'Active');
 
 try {
-    // Determine which filter to use based on priority
+    // Determine which filter to use based on priority: sub_sub_category > sub_category > category > subject
     if ($sub_sub_category_id != 0) {
-        // Fetch GR list based on sub_sub_category_id
+        // Fetch GR list based on sub_sub_category_id (highest priority)
         if ($status_filter && $status_filter !== 'All') {
             $query = "SELECT gr_id, subject_id, category_id, sub_category_id, sub_sub_category_id, gr_name, gr_link, date, file_upload_location, status, timestamp 
                       FROM gr_master 

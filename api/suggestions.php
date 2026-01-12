@@ -1,72 +1,86 @@
 <?php
 
-require "connect.inc.php"; // must define $conn (PDO)
+require "connect.inc.php";
 require "core.inc.php";
+require "api_logger.php";
 
 header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+$startTime = microtime(true);
+$endpoint = 'suggestions.php';
 
-$response = [];
-$errors = '';
+$response = array();
+$message = '';
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-/* ---------------- VALIDATION ---------------- */
+// Log the request
+ApiLogger::logRequest($endpoint, $data, 'POST');
 
-if (!isset($data['message'])) {
-    $errors .= "message not received\n";
-}
+$message .= isset($data['message']) ? "" : "message not received\n";
 
-if (empty($errors)) {
-    $message = trim($data['message']);
-    $contact = isset($data['contact']) ? trim($data['contact']) : null;
-    $user_id = isset($data['user_id']) ? $data['user_id'] : null;
+if (empty($message)) {
+    $message_text = trim($data['message']);
+    $contact = isset($data['contact']) ? trim($data['contact']) : '';
+    $user_id = isset($data['user_id']) && $data['user_id'] !== '' ? (int)$data['user_id'] : null;
 
-    if ($message === '') {
-        $errors .= "message can not be empty\n";
-    }
+    $message .= empty($message_text) ? "message can not be empty\n" : "";
 
-    if (empty($errors)) {
-
+    if (empty($message)) {
         try {
-            /* ---------------- INSERT ---------------- */
+            $query = "INSERT INTO suggestions (user_id, message, contact, status) 
+                      VALUES (:user_id, :message, :contact, 'pending')";
+            $statement = $connect->prepare($query);
+            $statement->bindValue(':user_id', $user_id, $user_id === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            $statement->bindValue(':message', $message_text, PDO::PARAM_STR);
+            $statement->bindValue(':contact', $contact !== '' ? $contact : null, $contact !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
 
-            $stmt = $conn->prepare(
-                "INSERT INTO suggestions (message, contact, user_id)
-                 VALUES (:message, :contact, :user_id)"
-            );
-
-            $stmt->execute([
-                ':message' => $message,
-                ':contact' => $contact,
-                ':user_id' => $user_id
-            ]);
-
-            if ($stmt->rowCount() > 0) {
-                $response['status'] = 'true';
-                $response['message'] = 'Suggestion submitted successfully';
+            if ($statement->execute()) {
+                $suggestion_id = $connect->lastInsertId();
+                $response["message"] = "Suggestion submitted successfully";
+                $response["status"] = 'true';
+                $response["suggestion_id"] = $suggestion_id;
+                
+                // Log successful response
+                $executionTime = microtime(true) - $startTime;
+                ApiLogger::logResponse($endpoint, $response, 200, $executionTime);
             } else {
-                $response['status'] = 'false';
-                $response['message'] = 'Insert failed';
+                $response["message"] = "Failed to save suggestion";
+                $response["status"] = 'false';
+                
+                // Log error
+                ApiLogger::logError($endpoint, "Failed to execute INSERT query", 500);
             }
-
-        } catch (PDOException $e) {
-            $response['status'] = 'false';
-            $response['message'] = 'DB Error: ' . $e->getMessage();
+            echo json_encode($response);
+        } catch (Exception $e) {
+            $response["message"] = "Error saving suggestion: " . $e->getMessage();
+            $response["status"] = 'false';
+            
+            // Log error
+            ApiLogger::logError($endpoint, "Exception: " . $e->getMessage(), 500);
+            
+            echo json_encode($response);
         }
-
     } else {
-        $response['status'] = 'false';
-        $response['message'] = $errors;
+        $response["message"] = "$message";
+        $response["status"] = 'false';
+        
+        // Log validation error
+        $executionTime = microtime(true) - $startTime;
+        ApiLogger::logResponse($endpoint, $response, 400, $executionTime);
+        
+        echo json_encode($response);
     }
 } else {
-    $response['status'] = 'false';
-    $response['message'] = $errors;
+    $response["message"] = "$message";
+    $response["status"] = 'false';
+    
+    // Log validation error
+    $executionTime = microtime(true) - $startTime;
+    ApiLogger::logResponse($endpoint, $response, 400, $executionTime);
+    
+    echo json_encode($response);
 }
-
-echo json_encode($response);
