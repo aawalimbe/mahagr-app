@@ -343,6 +343,7 @@ class _SubDept1State extends State<SubDept1> {
                   subjectId: widget.subjectId,
                   categoryId: widget.categoryId,
                   subCategoryId: scId,
+                  subSubCategoryId: 0,
                   subCategoryName: scName,
                   departmentNameMar: widget.departmentNameMar,
                   departmentNameEng: widget.departmentNameEng,
@@ -379,7 +380,8 @@ class _SubDept1State extends State<SubDept1> {
                           (_) => GrList(
                             subjectId: widget.subjectId,
                             categoryId: widget.categoryId,
-                            subCategoryId: subSubId,
+                            subCategoryId: scId,
+                            subSubCategoryId: subSubId,
                             subCategoryName: subSubName,
                             departmentNameMar: widget.departmentNameMar,
                             departmentNameEng: widget.departmentNameEng,

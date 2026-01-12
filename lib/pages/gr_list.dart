@@ -15,6 +15,7 @@ class GrList extends StatefulWidget {
   final int subjectId;
   final int categoryId;
   final int subCategoryId;
+  final int subSubCategoryId;
   final String subCategoryName;
   final String departmentNameMar;
   final String departmentNameEng;
@@ -24,6 +25,7 @@ class GrList extends StatefulWidget {
     required this.subjectId,
     required this.categoryId,
     required this.subCategoryId,
+    this.subSubCategoryId = 0,
     required this.subCategoryName,
     required this.departmentNameMar,
     required this.departmentNameEng,
@@ -56,6 +58,7 @@ class _GrListState extends State<GrList> {
           "subject_id": widget.subjectId,
           "category_id": widget.categoryId,
           "sub_category_id": widget.subCategoryId,
+          "sub_sub_category_id": widget.subSubCategoryId,
           "status": "Active",
         }),
       );

@@ -32,7 +32,9 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
   int? expandedIndex;
 
   Map<int, List<Map<String, dynamic>>> subcatsMap = {};
+  Map<int, List<Map<String, dynamic>>> subSubCatsMap = {};
   Set<int> loading = {};
+  Set<int> loadingSubSubCats = {};
 
   bool isLoading = true;
   String? errorMessage;
@@ -99,6 +101,38 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
     }
 
     loading.remove(categoryId);
+    setState(() {});
+  }
+
+  Future<void> fetchSubSubCats(int subCategoryId) async {
+    if (subSubCatsMap.containsKey(subCategoryId)) return;
+
+    loadingSubSubCats.add(subCategoryId);
+    setState(() {});
+
+    try {
+      final response = await http.post(
+        Uri.parse(ApiList.FetchSubSubcategories),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"sub_category_id": subCategoryId, "status": "All"}),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (data is Map && data.containsKey("sub_sub_categories")) {
+        subSubCatsMap[subCategoryId] = List<Map<String, dynamic>>.from(
+          data["sub_sub_categories"],
+        );
+      } else if (data is List) {
+        subSubCatsMap[subCategoryId] = List<Map<String, dynamic>>.from(data);
+      } else {
+        subSubCatsMap[subCategoryId] = [];
+      }
+    } catch (e) {
+      subSubCatsMap[subCategoryId] = [];
+    }
+
+    loadingSubSubCats.remove(subCategoryId);
     setState(() {});
   }
 
@@ -395,6 +429,7 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
                   subjectId: widget.subjectId,
                   categoryId: catId,
                   subCategoryId: 0,
+                  subSubCategoryId: 0,
                   subCategoryName: name,
                   departmentNameMar: widget.departmentNameMar,
                   departmentNameEng: widget.departmentNameEng,
@@ -413,13 +448,133 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
 
             final scName = sc["sub_category_name"] ?? sc["name"] ?? "";
 
+            // Check if this sub-category has sub-sub-categories
+            final hasSubSubCats = subSubCatsMap.containsKey(scId) && 
+                                   (subSubCatsMap[scId]?.isNotEmpty ?? false);
+
+            return Column(
+              children: [
+                Container(
+                  width: 330.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.celadon,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  margin: const EdgeInsets.only(bottom: 6),
+                  child: InkWell(
+                    onTap: () async {
+                      // If sub-sub-categories exist, fetch and show them
+                      if (!subSubCatsMap.containsKey(scId)) {
+                        await fetchSubSubCats(scId);
+                        setState(() {});
+                      } else {
+                        // Toggle expansion or navigate
+                        final subSubList = subSubCatsMap[scId] ?? [];
+                        if (subSubList.isEmpty) {
+                          // No sub-sub-categories, navigate to GR list
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => GrList(
+                                    subjectId: widget.subjectId,
+                                    categoryId: catId,
+                                    subCategoryId: scId,
+                                    subSubCategoryId: 0,
+                                    subCategoryName: scName,
+                                    departmentNameMar: widget.departmentNameMar,
+                                    departmentNameEng: widget.departmentNameEng,
+                                  ),
+                            ),
+                          );
+                        } else {
+                          // Has sub-sub-categories, show them (handled by buildSubSubCategories)
+                          setState(() {});
+                        }
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 8,
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(scName, style: AppTextStyles.regular(14)),
+                          ),
+                          if (subSubCatsMap.containsKey(scId) && 
+                              (subSubCatsMap[scId]?.isNotEmpty ?? false))
+                            Icon(
+                              Icons.arrow_drop_down,
+                              size: 20,
+                              color: AppColors.textOnDark,
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Show sub-sub-categories if they exist
+                if (subSubCatsMap.containsKey(scId) && 
+                    (subSubCatsMap[scId]?.isNotEmpty ?? false))
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.w, top: 5.h),
+                    child: buildSubSubCategories(catId, scId, scName),
+                  ),
+              ],
+            );
+          }).toList(),
+    );
+  }
+
+  Widget buildSubSubCategories(int catId, int subCatId, String subCatName) {
+    if (loadingSubSubCats.contains(subCatId)) {
+      return const Padding(
+        padding: EdgeInsets.all(10),
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    final subSubList = subSubCatsMap[subCatId] ?? [];
+
+    if (subSubList.isEmpty) {
+      // No sub-sub-categories, navigate to GR list with sub-category
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (_) => GrList(
+                  subjectId: widget.subjectId,
+                  categoryId: catId,
+                  subCategoryId: subCatId,
+                  subSubCategoryId: 0,
+                  subCategoryName: subCatName,
+                  departmentNameMar: widget.departmentNameMar,
+                  departmentNameEng: widget.departmentNameEng,
+                ),
+          ),
+        );
+      });
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      children:
+          subSubList.map((ssc) {
+            final subSubId =
+                int.tryParse("${ssc['sub_sub_category_id'] ?? ssc['id']}") ?? 0;
+
+            final subSubName = ssc["sub_sub_category_name"] ?? ssc["name"] ?? "";
+
             return Container(
-              width: 330.w,
+              width: 300.w,
+              margin: const EdgeInsets.only(bottom: 6),
               decoration: BoxDecoration(
-                color: AppColors.celadon,
+                color: AppColors.celadon.withOpacity(0.7),
                 borderRadius: BorderRadius.circular(6),
               ),
-              margin: const EdgeInsets.only(bottom: 6),
               child: InkWell(
                 onTap: () {
                   Navigator.push(
@@ -429,8 +584,9 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
                           (_) => GrList(
                             subjectId: widget.subjectId,
                             categoryId: catId,
-                            subCategoryId: scId,
-                            subCategoryName: scName,
+                            subCategoryId: subCatId,
+                            subSubCategoryId: subSubId,
+                            subCategoryName: subSubName,
                             departmentNameMar: widget.departmentNameMar,
                             departmentNameEng: widget.departmentNameEng,
                           ),
@@ -442,7 +598,7 @@ class _SubSubDepartmentsState extends State<SubSubDepartments> {
                     vertical: 10,
                     horizontal: 8,
                   ),
-                  child: Text(scName, style: AppTextStyles.regular(14)),
+                  child: Text(subSubName, style: AppTextStyles.regular(13)),
                 ),
               ),
             );
