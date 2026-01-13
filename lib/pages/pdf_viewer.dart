@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math' as math;
 
@@ -9,6 +10,7 @@ import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widget
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/viewer_bottomNevigator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 class PdfViewer extends StatefulWidget {
@@ -75,19 +77,31 @@ class _PdfViewerState extends State<PdfViewer> {
         }
       }
 
-      // Otherwise, use the default location based on title
+      // Otherwise, use the default location based on title and URL hash
+      // Use URL hash to ensure unique filename even if titles are the same
       final dir = await getApplicationDocumentsDirectory();
       final sanitizedName = widget.documentTitle
           .replaceAll(RegExp(r"[^\w\s-]"), "")
           .replaceAll(RegExp(r"\s+"), "_");
-      final file = File("${dir.path}/$sanitizedName.pdf");
+      // Create hash from PDF URL to ensure uniqueness
+      final urlHash = widget.pdfUrl.hashCode.toRadixString(36).replaceAll('-', 'a');
+      final uniqueFileName = "${sanitizedName}_$urlHash.pdf";
+      final file = File("${dir.path}/$uniqueFileName");
 
-      // Check if file already exists, if not download it
+      // Delete previous cached PDF if it exists and is different from current
+      await _deletePreviousCache(file.path);
+
+      // Always check if this specific PDF URL's file exists
+      // If file exists but is from a different PDF (different URL), re-download
       if (!await file.exists()) {
         final bytes = await ApiService.downloadFilefromUrl(widget.pdfUrl);
         await file.writeAsBytes(bytes);
       }
       _downloadedFile = file;
+
+      // Store current cache file path for next time
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('last_cached_pdf_path', file.path);
 
       setState(() => _isLoading = false);
     } catch (e) {
@@ -95,6 +109,26 @@ class _PdfViewerState extends State<PdfViewer> {
         _isLoading = false;
         _error = "Error loading PDF: $e";
       });
+    }
+  }
+
+  Future<void> _deletePreviousCache(String currentFilePath) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final previousCachePath = prefs.getString('last_cached_pdf_path');
+      
+      // If there's a previous cache file and it's different from current, delete it
+      if (previousCachePath != null && previousCachePath != currentFilePath) {
+        final previousFile = File(previousCachePath);
+        // Only delete if it exists and is not a saved document
+        // Saved documents are in a subdirectory, so we check the path
+        if (await previousFile.exists() && !previousCachePath.contains('saved_documents')) {
+          await previousFile.delete();
+        }
+      }
+    } catch (e) {
+      // Silently fail - cache cleanup is not critical
+      print('Error deleting previous cache: $e');
     }
   }
 
