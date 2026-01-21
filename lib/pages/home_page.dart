@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -151,12 +152,25 @@ class _HomePageState extends State<HomePage> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Image.asset(
-                                            department['logo'],
-                                            width: isWide ? 55 : 65,
-                                            height: isWide ? 55 : 65,
-                                            fit: BoxFit.contain,
+                                          Container(
+                                            width: isWide ? 65 : 75,
+                                            height: isWide ? 65 : 75,
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  themeProvider.isDarkMode
+                                                      ? Colors.white
+                                                      : Colors
+                                                          .transparent, // 🔹 change to any color you want
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Image.asset(
+                                              department['logo'],
+                                              fit: BoxFit.contain,
+                                            ),
                                           ),
+
                                           const SizedBox(height: 6),
                                           Text(
                                             name,

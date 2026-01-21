@@ -130,13 +130,72 @@ class _PdfViewerState extends State<PdfViewer> {
 
   Future<void> _share() async {
     if (_downloadedFile == null) return;
-    await Share.shareXFiles([
-      XFile(_downloadedFile!.path),
-    ], text: "Sharing: ${widget.documentTitle}");
+
+    final pdfUrl = Uri.encodeComponent(widget.pdfUrl);
+
+    final String shareUrl =
+        "https://mahagralert.com/pdf?"
+        "url=$pdfUrl"
+        "&title=${Uri.encodeComponent(widget.documentTitle)}";
+
+    await Share.share("View PDF:\n$shareUrl");
+  }
+
+  Future<bool> _canDownloadToday() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final String today = DateTime.now().toIso8601String().substring(0, 10);
+
+    final String? savedDate = prefs.getString('download_date');
+    int downloadCount = prefs.getInt('download_count') ?? 0;
+
+    // Reset count if date changed
+    if (savedDate != today) {
+      await prefs.setString('download_date', today);
+      await prefs.setInt('download_count', 0);
+      downloadCount = 0;
+    }
+
+    return downloadCount < 10;
+  }
+
+  Future<void> _incrementDownloadCount() async {
+    final prefs = await SharedPreferences.getInstance();
+    int count = prefs.getInt('download_count') ?? 0;
+    await prefs.setInt('download_count', count + 1);
   }
 
   Future<void> _download() async {
     if (_downloadedFile == null) return;
+
+    // 🔴 Check daily limit
+    final canDownload = await _canDownloadToday();
+
+    if (!canDownload) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              "Download Limit Reached",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: const Text(
+              "You can download only 10 PDFs per day.\nPlease try again tomorrow.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
     setState(() => _isDownloading = true);
 
@@ -145,6 +204,9 @@ class _PdfViewerState extends State<PdfViewer> {
     if (!mounted) return;
 
     setState(() => _isDownloading = false);
+
+    // ✅ Increase count AFTER successful download
+    await _incrementDownloadCount();
 
     showDialog(
       context: context,
@@ -155,17 +217,17 @@ class _PdfViewerState extends State<PdfViewer> {
             "PDF Saved",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
-          content: const Text("PDF is saved on your local device."),
+          content: const Text("PDF is saved on your local storage."),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close popup
+                Navigator.pop(context);
               },
               child: const Text("Close"),
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context); // Close popup
+                Navigator.pop(context);
                 await OpenFilex.open(_downloadedFile!.path);
               },
               child: const Text("Open PDF"),

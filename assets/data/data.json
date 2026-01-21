@@ -1,29 +1,29 @@
 {
-"departments": [
-  { "id": 1, "subject_id": 1,  "name_mar": "कायदे व नियम","name_eng": "Acts and Rules","logo": "assets/images/original/कायदे व नियम.jpg" },
-  { "id": 2, "subject_id": 14, "name_mar": "शासन निर्णय व परिपत्रके","name_eng": "Government Resolutions & Circulars","logo": "assets/images/original/शासन निर्णय व परिपत्रके.png" },
-  { "id": 3, "subject_id": 11, "name_mar": "महाराष्ट्र शासनाचे राजपत्र","name_eng": "Maharashtra Government Gazette","logo": "assets/images/original/महाराष्ट्र शासन राजपत्र.jpg"},
-  { "id": 4, "subject_id": 3,  "name_mar": "मंत्रिमंडळ निर्णय","name_eng": "Cabinet Decisions","logo": "assets/images/original/मंत्रिमंडळ निर्णय.jpg" },
-  { "id": 5, "subject_id": 9, "name_mar": "शासकीय धोरण","name_eng": "Government Policies","logo": "assets/images/original/शासनाचे धोरण.png" },
-  { "id": 6, "subject_id": 15, "name_mar": "शासकीय योजना","name_eng": "Government Schemes","logo": "assets/images/original/शासकीय योजना.png" },
-  { "id": 7, "subject_id": 5,  "name_mar": "नागरिकांची सनद","name_eng": "Citizen Charter","logo": "assets/images/original/नागरिकांची सनद.jpg" },
-  { "id": 8, "subject_id": 7,  "name_mar": "माहितीचा अधिकार","name_eng": "Right to Information","logo": "assets/images/original/माहितीचा अधिकार .jpg" },
-  { "id": 9, "subject_id": 8,  "name_mar": "लोकसेवा","name_eng": "Public Services","logo": "assets/images/original/लोकसेवा.jpg"},
-  { "id": 10,"subject_id": 4,  "name_mar": "कोषागार नमुने","name_eng": "Treasury Forms","logo": "assets/images/original/कोषागार नमुने.png"},
-  { "id": 11,"subject_id": 13, "name_mar": "वार्षिक अहवाल","name_eng": "Annual Report","logo": "assets/images/original/वार्षिक अहवाल.jpg" },
-  { "id": 12,"subject_id": 10, "name_mar": "शासकीय दिनदर्शिका","name_eng": "Government Calendar","logo": "assets/images/original/शासकीय दिनदर्शिका.jpg" },
-  { "id": 13,"subject_id": 6,  "name_mar": "महत्त्वाची संकेतस्थळे","name_eng": "Important Websites","logo": "assets/images/original/महत्त्वाची संकेतस्थळे.jpg"},
-  { "id": 14,"subject_id": 12, "name_mar": "मोबाईल ॲप्स","name_eng": "Government Mobile Apps","logo": "assets/images/original/शासकीय मोबाईल अँप.jpg" },
-  { "id": 15,"subject_id": 2,  "name_mar": "ई-बुक","name_eng": "E-Book","logo": "assets/images/original/ई-बुक.jpg"}
-],
+  "departments": [
+    { "id": 1, "subject_id": 1,  "name_mar": "कायदे व नियम","name_eng": "Acts and Rules","logo": "assets/images/original/कायदे व नियम.png" },
+    { "id": 2, "subject_id": 14, "name_mar": "शासन निर्णय व परिपत्रके","name_eng": "Government Resolutions & Circulars","logo": "assets/images/original/शासन निर्णय व परिपत्रके.png" },
+    { "id": 3, "subject_id": 11, "name_mar": "महाराष्ट्र शासनाचे राजपत्र","name_eng": "Maharashtra Government Gazette","logo": "assets/images/original/महाराष्ट्र शासन राजपत्र.jpg"},
+    { "id": 4, "subject_id": 3,  "name_mar": "मंत्रिमंडळ निर्णय","name_eng": "Cabinet Decisions","logo": "assets/images/original/मंत्रिमंडळ निर्णय.png" },
+    { "id": 5, "subject_id": 9, "name_mar": "शासकीय धोरण","name_eng": "Government Policies","logo": "assets/images/original/शासनाचे धोरण.png" },
+    { "id": 6, "subject_id": 15, "name_mar": "शासकीय योजना","name_eng": "Government Schemes","logo": "assets/images/original/शासकीय योजना.png" },
+    { "id": 7, "subject_id": 5,  "name_mar": "नागरिकांची सनद","name_eng": "Citizen Charter","logo": "assets/images/original/नागरिकांची सनद.jpg" },
+    { "id": 8, "subject_id": 7,  "name_mar": "माहितीचा अधिकार","name_eng": "Right to Information","logo": "assets/images/original/माहितीचा अधिकार .jpg" },
+    { "id": 9, "subject_id": 8,  "name_mar": "लोकसेवा","name_eng": "Public Services","logo": "assets/images/original/लोकसेवा.jpg"},
+    { "id": 10,"subject_id": 4,  "name_mar": "कोषागार नमुने","name_eng": "Treasury Forms","logo": "assets/images/original/कोषागार नमुने.png"},
+    { "id": 11,"subject_id": 13, "name_mar": "वार्षिक अहवाल","name_eng": "Annual Report","logo": "assets/images/original/वार्षिक अहवाल.jpg" },
+    { "id": 12,"subject_id": 10, "name_mar": "शासकीय दिनदर्शिका","name_eng": "Government Calendar","logo": "assets/images/original/शासकीय दिनदर्शिका.jpg" },
+    { "id": 13,"subject_id": 6,  "name_mar": "महत्त्वाची संकेतस्थळे","name_eng": "Important Websites","logo": "assets/images/original/महत्त्वाची संकेतस्थळे.jpg"},
+    { "id": 14,"subject_id": 12, "name_mar": "मोबाईल ॲप्स","name_eng": "Government Mobile Apps","logo": "assets/images/original/शासकीय मोबाईल अँप.jpg" },
+    { "id": 15,"subject_id": 2,  "name_mar": "ई-बुक","name_eng": "E-Book","logo": "assets/images/original/ई-बुक.jpg"}
+  ],
 
-"subdepartment":[
-  {"id": 1,"subject_id":14,"category_id":302,"name_mar": "सामान्य प्रशासन विभाग","name_eng": "General Administration Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/सामान्य प्रशासन विभाग.png"},
-  {"id": 2,"subject_id":14,"category_id":303,"name_mar": "वित्त विभाग","name_eng": "Finance Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वित्त विभाग.jpg"},
-  {"id": 3,"subject_id":14,"category_id":304,"name_mar": "महसूल विभाग","name_eng": "Revenue Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img4.png"},
-  {"id": 4,"subject_id":14,"category_id":305,"name_mar": "वन विभाग","name_eng": "Forest Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वन विभाग.png"},
-  {"id": 5,"subject_id":14,"category_id":306,"name_mar": "शालेय शिक्षण विभाग","name_eng": "School Education Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/शालेय शिक्षण विभाग.png"},
-  {"id": 6,"subject_id":14,"category_id":307,"name_mar": "कृषी विभाग","name_eng": "Agriculture Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img8.png"},
-  {"id": 7,"subject_id":14,"category_id":308,"name_mar": "रोहयो विभाग","name_eng": "Employment Guarantee Scheme Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/रोजगार हमी योजना विभाग.jpg"}
-]
+  "subdepartment":[
+    {"id": 1,"subject_id":14,"category_id":302,"name_mar": "सामान्य प्रशासन विभाग","name_eng": "General Administration Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/सामान्य प्रशासन विभाग.png"},
+    {"id": 2,"subject_id":14,"category_id":303,"name_mar": "वित्त विभाग","name_eng": "Finance Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वित्त विभाग.jpg"},
+    {"id": 3,"subject_id":14,"category_id":304,"name_mar": "महसूल विभाग","name_eng": "Revenue Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img4.png"},
+    {"id": 4,"subject_id":14,"category_id":305,"name_mar": "वन विभाग","name_eng": "Forest Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/वन विभाग.png"},
+    {"id": 5,"subject_id":14,"category_id":306,"name_mar": "शालेय शिक्षण विभाग","name_eng": "School Education Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/शालेय शिक्षण विभाग.png"},
+    {"id": 6,"subject_id":14,"category_id":307,"name_mar": "कृषी विभाग","name_eng": "Agriculture Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/img8.png"},
+    {"id": 7,"subject_id":14,"category_id":308,"name_mar": "रोहयो विभाग","name_eng": "Employment Guarantee Scheme Department","logo": "assets/images/original/शासन निर्णय व परिपत्रके1/रोजगार हमी योजना विभाग.jpg"}
+  ]
 }

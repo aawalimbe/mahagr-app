@@ -1,30 +1,18 @@
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:forrest_department_gr_and_updatees_app/pages/payment_info.dart';
+import 'package:forrest_department_gr_and_updatees_app/pages/pdf_viewer.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/api_service.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/language_provider.dart';
 import 'package:forrest_department_gr_and_updatees_app/reusable_or_snipit_widgets/theme_provider.dart';
-import 'package:forrest_department_gr_and_updatees_app/splash_screen.dart';
 import 'package:forrest_department_gr_and_updatees_app/test_connection.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
-  //initializes Flutter's engine and platform bindings before
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase (optional - uncomment if Firebase is configured)
-  // if (!kIsWeb) {
-  //   try {
-  //     await Firebase.initializeApp();
-  //   } catch (e) {
-  //     debugPrint('Firebase initialization failed: $e');
-  //   }
-  // }
-
-  // Initialize API service
   ApiService.initialize();
-
-  // Test online connection
   await testOnlineConnection();
 
   runApp(
@@ -38,10 +26,64 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+/// 🔑 REQUIRED FOR DEEP LINK NAVIGATION
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late final AppLinks _appLinks;
+
+  @override
+  void initState() {
+    super.initState();
+    _appLinks = AppLinks();
+    _initDeepLinks();
+  }
+
+  /// ✅ Handles BOTH cold start & background links
+  void _initDeepLinks() {
+    // App opened from terminated state
+    _appLinks.getInitialLink().then((uri) {
+      if (uri != null) {
+        _handleUri(uri);
+      }
+    });
+
+    // App already running
+    _appLinks.uriLinkStream.listen((uri) {
+      if (uri != null) {
+        _handleUri(uri);
+      }
+    });
+  }
+
+  void _handleUri(Uri uri) {
+    // Expected:
+    // https://mahagralert.com/pdf?url=PDF_URL&title=TITLE
+    if (uri.host == 'mahagralert.com' && uri.path == '/pdf') {
+      final pdfUrl = uri.queryParameters['url'];
+      final title = uri.queryParameters['title'];
+
+      if (pdfUrl != null) {
+        navigatorKey.currentState?.push(
+          MaterialPageRoute(
+            builder:
+                (_) => PdfViewer(
+                  pdfUrl: Uri.decodeComponent(pdfUrl),
+                  documentTitle: title ?? 'PDF Document',
+                ),
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -52,15 +94,14 @@ class MyApp extends StatelessWidget {
         return Consumer<ThemeProvider>(
           builder: (context, themeProvider, _) {
             return MaterialApp(
+              navigatorKey: navigatorKey,
               title: 'Forest Department GR and Updates App Demo',
               debugShowCheckedModeBanner: false,
               builder: (context, child) {
                 return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                    textScaler: const TextScaler.linear(
-                      1.0,
-                    ), // This will stop app font use the device font size.
-                  ),
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(textScaler: const TextScaler.linear(1.0)),
                   child: child!,
                 );
               },
@@ -73,7 +114,7 @@ class MyApp extends StatelessWidget {
           },
         );
       },
-      child: const PaymentMethodsPage(),
+      child: const PaymentMethodsPage(), // your existing start page
     );
   }
 }

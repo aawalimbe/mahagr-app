@@ -48,10 +48,10 @@ class AppColors {
   ); // Light green accent
   static final Color darkTextPrimaryColor = Color(0xFFE0E0E0); // Primary text
   static final Color darkTextSecondaryColor = Color(
-    0xFFBDBDBD,
+    0xFF58B95B,
   ); // Secondary text
   static final Color darkBorderColor = Color(0xFF4CAF50); // Green borders
-  static final Color darkIconColor = Color(0xFF4CAF50); // Green icons
+  static final Color darkIconColor = Color(0xFF58B95B); // Green icons
 
   // Dark Theme Status Colors
   static final Color darkErrorLight = Color(0xFF3D1B1B); // Dark red background
